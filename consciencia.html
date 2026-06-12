@@ -868,30 +868,36 @@ const ARTISTS = [
 // STATE
 // ═══════════════════════════════════════════════════════════════
 const STORAGE_KEY = 'consciencia_likes';
-
-function encodeLikes(likes) {
-  try { return btoa(unescape(encodeURIComponent(JSON.stringify(likes)))); } catch { return ''; }
-}
-
-function decodeLikes(str) {
-  try { return JSON.parse(decodeURIComponent(escape(atob(str)))); } catch { return null; }
-}
+const SB_URL = 'https://cjwhykxguhidxzggvngx.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqd2h5a3hndWhpZHh6Z2d2bmd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyODg3NTgsImV4cCI6MjA5Njg2NDc1OH0.FsW8NBAQ_P-xC2LArFwpc--p-wg_8TyJjZ4OznvrLmo';
+const SB_HEADERS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
 
 function loadLikes() {
-  const hash = window.location.hash.slice(1);
-  if (hash) {
-    const fromHash = decodeLikes(hash);
-    if (fromHash && typeof fromHash === 'object') return fromHash;
-  }
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
 }
 
-function saveLikes() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.likes));
-    history.replaceState(null, '', '#' + encodeLikes(state.likes));
-  } catch {}
+async function fetchSupabaseLikes() {
+  const res = await fetch(`${SB_URL}/rest/v1/likes_state?id=eq.1&select=data`, { headers: SB_HEADERS });
+  const rows = await res.json();
+  return (rows && rows[0]) ? rows[0].data : {};
 }
+
+function saveLikes() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.likes)); } catch {}
+  fetch(`${SB_URL}/rest/v1/likes_state?id=eq.1`, {
+    method: 'PATCH',
+    headers: { ...SB_HEADERS, 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ data: state.likes }),
+  }).catch(() => {});
+}
+
+// Start fetching from Supabase immediately (runs during entry screen)
+const _sbReady = fetchSupabaseLikes().then(likes => {
+  if (likes && typeof likes === 'object') {
+    state.likes = likes;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(likes));
+  }
+}).catch(() => {});
 
 let state = {
   currentUser: null,   // 'Emma' | 'TJ'
