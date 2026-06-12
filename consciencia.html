@@ -67,7 +67,7 @@
     width: 220px;
     transition: border-color .2s;
   }
-  #entry-form input::placeholder { letter-spacing: 2px; opacity: .5; }
+  #entry-form input::placeholder { letter-spacing: 2px; color: rgba(255,255,255,0.75); opacity: 1; }
   #entry-form input:focus { border-color: var(--purple); }
   #entry-error {
     color: #ff7070; font-size: 12px; font-family: var(--futura);
@@ -101,9 +101,9 @@
   }
   #user-screen > * { position: relative; z-index: 1; }
   #user-screen h2 {
-    font-family: var(--futura); font-size: 13px; font-weight: 700;
-    letter-spacing: 4px; text-transform: uppercase; opacity: .9;
-    text-shadow: 0 2px 16px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7);
+    font-family: var(--futura); font-size: 20px; font-weight: 700;
+    letter-spacing: 5px; text-transform: uppercase; opacity: 1;
+    text-shadow: 0 2px 8px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,0.95), 0 0 60px rgba(0,0,0,0.8);
   }
   .user-select-row { display: flex; gap: 20px; }
   .user-oval-btn {
@@ -123,11 +123,16 @@
     border-radius: 50px; color: #fff; cursor: pointer;
     font-family: var(--futura); font-size: 13px; font-weight: 700;
     letter-spacing: 2px; padding: 10px 36px; text-transform: uppercase;
-    transition: background .2s; opacity: 0; pointer-events: none;
-    transition: opacity .3s, background .2s;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s, background .2s, border-color .2s;
   }
-  #user-enter-btn.visible { opacity: 1; pointer-events: all; }
-  #user-enter-btn:hover { background: rgba(255,255,255,0.25); }
+  #user-enter-btn.visible {
+    opacity: 1; pointer-events: all;
+    background: rgba(255,255,255,0.92);
+    border-color: #fff;
+    color: #111;
+  }
+  #user-enter-btn.visible:hover { background: #fff; border-color: var(--purple); }
 
   /* ══════════════════════════════════════════
      MAIN APP
@@ -862,9 +867,19 @@ const ARTISTS = [
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
+const STORAGE_KEY = 'consciencia_likes';
+
+function loadLikes() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+
+function saveLikes() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.likes)); } catch {}
+}
+
 let state = {
   currentUser: null,   // 'Emma' | 'TJ'
-  likes: {},           // { "name_day": { emma: bool, tj: bool } }
+  likes: loadLikes(),  // { "name_day": { emma: bool, tj: bool } }
   activeDay: 'all',
   sortMode: 'stage',   // 'stage' | 'genre'
 };
@@ -1017,6 +1032,7 @@ function toggleLike(artist) {
   } else {
     state.likes[k].tj = !state.likes[k].tj;
   }
+  saveLikes();
 }
 
 // ═══════════════════════════════════════════════════════════════
