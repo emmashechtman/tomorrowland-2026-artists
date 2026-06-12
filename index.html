@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consciencia — Tomorrowland 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+  /* ── FUTURA STACK (system fallback that reads as Futura) ── */
+  :root {
+    --futura: 'Futura', 'Century Gothic', 'Trebuchet MS', sans-serif;
+    --pink:   #FF9AD5;
+    --blue:   #7DD3F5;
+    --purple: #C97EFF;
+    --grey:   #3A3A3A;
+    --grey-bg:#1C1C1C;
+    --off-white: #F5F5F5;
+    --white: #FFFFFF;
+    --tab-active: #FFFFFF;
+    --tab-inactive: rgba(255,255,255,0.15);
+    --font-size-base: 13px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: var(--futura); background: #111; color: var(--white); }
+
+  /* ══════════════════════════════════════════
+     PASSWORD / ENTRY SCREEN
+  ══════════════════════════════════════════ */
+  #entry-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #000 url('Conciencia background.webp') center/cover no-repeat;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 32px;
+  }
+  #entry-screen > * { position: relative; z-index: 1; }
+  #entry-logo {
+    width: min(480px, 78vw);
+    filter:
+      drop-shadow(0 0 18px rgba(255,255,255,0.95))
+      drop-shadow(0 0 50px rgba(201,126,255,0.75))
+      drop-shadow(0 0 100px rgba(201,126,255,0.45))
+      drop-shadow(0 0 160px rgba(150,80,255,0.25));
+  }
+  #entry-form {
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    background: rgba(0,0,0,0.42);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 28px 44px 32px;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+  #entry-form input {
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: 50px;
+    color: #fff;
+    font-family: var(--futura);
+    font-size: 16px;
+    letter-spacing: 4px;
+    padding: 12px 28px;
+    text-align: center;
+    outline: none;
+    width: 220px;
+    transition: border-color .2s;
+  }
+  #entry-form input::placeholder { letter-spacing: 2px; opacity: .5; }
+  #entry-form input:focus { border-color: var(--purple); }
+  #entry-error {
+    color: #ff7070; font-size: 12px; font-family: var(--futura);
+    opacity: 0; transition: opacity .2s; height: 16px;
+  }
+  #entry-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.4);
+    border-radius: 50px;
+    color: #fff;
+    cursor: pointer;
+    font-family: var(--futura);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 10px 36px;
+    text-transform: uppercase;
+    transition: background .2s, border-color .2s;
+  }
+  #entry-btn:hover { background: rgba(255,255,255,0.25); border-color: var(--purple); }
+
+  /* ══════════════════════════════════════════
+     USER SELECT SCREEN
+  ══════════════════════════════════════════ */
+  #user-screen {
+    position: fixed; inset: 0; z-index: 9998;
+    background: #000 url('Conciencia background.webp') center/cover no-repeat;
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 36px;
+  }
+  #user-screen > * { position: relative; z-index: 1; }
+  #user-screen h2 {
+    font-family: var(--futura); font-size: 13px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase; opacity: .9;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7);
+  }
+  .user-select-row { display: flex; gap: 20px; }
+  .user-oval-btn {
+    padding: 12px 36px; border-radius: 50px;
+    font-family: var(--futura); font-size: 16px; font-weight: 700;
+    letter-spacing: 2px; cursor: pointer; border: 2px solid transparent;
+    transition: all .2s; background: var(--grey);
+    color: #fff; text-transform: uppercase;
+  }
+  .user-oval-btn[data-user="Emma"]:hover,
+  .user-oval-btn[data-user="Emma"].active { background: var(--pink); color: #111; border-color: var(--pink); }
+  .user-oval-btn[data-user="TJ"]:hover,
+  .user-oval-btn[data-user="TJ"].active { background: var(--blue); color: #111; border-color: var(--blue); }
+  #user-enter-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.4);
+    border-radius: 50px; color: #fff; cursor: pointer;
+    font-family: var(--futura); font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; padding: 10px 36px; text-transform: uppercase;
+    transition: background .2s; opacity: 0; pointer-events: none;
+    transition: opacity .3s, background .2s;
+  }
+  #user-enter-btn.visible { opacity: 1; pointer-events: all; }
+  #user-enter-btn:hover { background: rgba(255,255,255,0.25); }
+
+  /* ══════════════════════════════════════════
+     MAIN APP
+  ══════════════════════════════════════════ */
+  #app {
+    display: none; flex-direction: column;
+    height: 100vh; overflow: hidden;
+    background: #000;
+    position: relative;
+  }
+  #app::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url('Conciencia background.webp') center/cover no-repeat;
+    opacity: 0.17;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* TOP BAR */
+  #topbar {
+    background: rgba(18,18,18,0.93);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 10px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+    gap: 12px;
+    position: relative; z-index: 1;
+  }
+  #logo-small {
+    height: 28px; opacity: .9;
+    filter: brightness(1.1);
+  }
+
+  /* USER TOGGLE */
+  #user-toggle {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--futura); font-size: 11px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: rgba(255,255,255,0.5);
+  }
+  #user-toggle span { opacity: .5; }
+  .utoggle-btn {
+    padding: 5px 16px; border-radius: 50px;
+    font-family: var(--futura); font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; cursor: pointer; border: 1.5px solid rgba(255,255,255,0.15);
+    background: transparent; color: rgba(255,255,255,0.35); text-transform: uppercase;
+    transition: all .18s;
+  }
+  .utoggle-btn[data-user="Emma"].active { background: var(--pink); color: #111; border-color: var(--pink); }
+  .utoggle-btn[data-user="TJ"].active { background: var(--blue); color: #111; border-color: var(--blue); }
+
+  /* MAIN TABS */
+  #main-tabs {
+    display: flex; gap: 10px; padding: 14px 20px 0;
+    background: rgba(18,18,18,0.90); flex-shrink: 0;
+    position: relative; z-index: 1;
+  }
+  .main-tab {
+    font-family: var(--futura); font-size: 17px; font-weight: 700;
+    letter-spacing: 1px; cursor: pointer;
+    background: transparent; border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50px; color: rgba(255,255,255,0.4);
+    padding: 10px 32px; text-transform: uppercase;
+    transition: all .18s;
+  }
+  .main-tab.active {
+    background: var(--white); border-color: var(--white);
+    color: #111;
+  }
+  .main-tab:hover:not(.active) {
+    border-color: rgba(255,255,255,0.6); color: rgba(255,255,255,0.7);
+  }
+
+  /* SCROLLABLE CONTENT */
+  #content {
+    flex: 1; overflow-y: auto;
+    background: transparent;
+    position: relative; z-index: 1;
+  }
+
+  /* ── ARTISTS PAGE ── */
+  #artists-page { display: none; }
+  #timetable-page { display: none; }
+
+  /* Day tabs */
+  #day-tabs {
+    display: flex; gap: 8px; padding: 14px 20px 10px;
+    background: rgba(16,16,16,0.88); border-bottom: 1px solid rgba(255,255,255,0.06);
+    position: sticky; top: 0; z-index: 10;
+    flex-wrap: wrap; align-items: center; justify-content: space-between;
+  }
+  .day-tab-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .day-tab {
+    font-family: var(--futura); font-size: 11px; font-weight: 700;
+    letter-spacing: 1.2px; cursor: pointer;
+    background: transparent; border: 1.5px solid rgba(255,255,255,0.18);
+    border-radius: 50px; color: rgba(255,255,255,0.4);
+    padding: 6px 16px; text-transform: uppercase; transition: all .15s;
+  }
+  .day-tab.active {
+    background: var(--white); border-color: var(--white); color: #111;
+  }
+  .day-tab:hover:not(.active) { color: rgba(255,255,255,.7); border-color: rgba(255,255,255,.4); }
+
+  /* Sort controls */
+  .sort-group {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--futura); font-size: 10px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: rgba(255,255,255,.35);
+  }
+  .sort-btn {
+    font-family: var(--futura); font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; cursor: pointer; text-transform: uppercase;
+    background: transparent; border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 50px; color: rgba(255,255,255,0.3);
+    padding: 4px 12px; transition: all .15s;
+  }
+  .sort-btn.active { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.35); color: rgba(255,255,255,.8); }
+  .sort-btn:hover:not(.active) { color: rgba(255,255,255,.55); border-color: rgba(255,255,255,.3); }
+
+  /* Artists container */
+  #artists-container { padding: 20px; }
+
+  /* Group headers */
+  .group-header {
+    font-family: var(--futura); font-size: 10px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.3); margin: 24px 0 12px;
+    padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .group-header:first-child { margin-top: 0; }
+
+  /* Artist pill */
+  .artist-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+  .artist-pill {
+    display: inline-flex; flex-direction: column; align-items: flex-start;
+    background: var(--grey);
+    border-radius: 50px; padding: 8px 18px;
+    cursor: pointer; transition: background .15s, transform .1s;
+    user-select: none; border: 1.5px solid transparent;
+    min-width: 0;
+  }
+  .artist-pill:active { transform: scale(0.96); }
+  .pill-name {
+    font-family: var(--futura); font-size: 13px; font-weight: 400;
+    color: var(--white); white-space: nowrap; line-height: 1.2;
+    letter-spacing: .3px;
+  }
+  .pill-genre {
+    font-family: var(--futura); font-style: italic; font-size: 10px;
+    color: rgba(255,255,255,0.55); white-space: nowrap; line-height: 1;
+    margin-top: 1px;
+  }
+
+  /* Liked states */
+  .artist-pill.liked-emma { background: var(--pink); }
+  .artist-pill.liked-emma .pill-name { color: #111; font-weight: 700; }
+  .artist-pill.liked-emma .pill-genre { color: rgba(0,0,0,0.5); }
+
+  .artist-pill.liked-tj { background: var(--blue); }
+  .artist-pill.liked-tj .pill-name { color: #111; font-weight: 700; }
+  .artist-pill.liked-tj .pill-genre { color: rgba(0,0,0,0.5); }
+
+  .artist-pill.liked-both { background: var(--purple); }
+  .artist-pill.liked-both .pill-name { color: #fff; font-weight: 700; }
+  .artist-pill.liked-both .pill-genre { color: rgba(255,255,255,0.65); }
+
+  /* TIMETABLE placeholder */
+  #timetable-page {
+    display: none; align-items: center; justify-content: center;
+    height: 100%; min-height: 60vh;
+    font-family: var(--futura); font-style: italic;
+    font-size: clamp(28px, 6vw, 52px); color: rgba(255,255,255,0.18);
+    letter-spacing: 2px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+
+  /* Entry screen hidden */
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    .main-tab { font-size: 14px; padding: 8px 22px; }
+    #artists-container { padding: 14px; }
+    .artist-pill { padding: 7px 14px; }
+    .pill-name { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ ENTRY SCREEN ══ -->
+<div id="entry-screen">
+  <img id="entry-logo" src="Conciencia logo.png" alt="Consciencia" onerror="this.style.cssText='font-family:var(--futura);font-size:clamp(32px,8vw,64px);font-weight:700;letter-spacing:4px;color:#fff;display:block'">
+  <div id="entry-form">
+    <input type="password" id="pw-input" placeholder="enter password" autocomplete="off" />
+    <div id="entry-error">Incorrect password. Try again.</div>
+    <button id="entry-btn">Enter</button>
+  </div>
+</div>
+
+<!-- ══ USER SELECT SCREEN ══ -->
+<div id="user-screen">
+  <img style="width:min(320px,60vw); filter:drop-shadow(0 0 30px rgba(201,126,255,.4));"
+       src="Conciencia logo.png" alt="Consciencia"
+       onerror="this.style.display='none'">
+  <h2>Who are you?</h2>
+  <div class="user-select-row">
+    <button class="user-oval-btn" data-user="Emma">Emma</button>
+    <button class="user-oval-btn" data-user="TJ">TJ</button>
+  </div>
+  <button id="user-enter-btn">Let's Go →</button>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="app">
+
+  <!-- Top bar -->
+  <div id="topbar">
+    <img id="logo-small" src="Conciencia logo.png" alt="Consciencia"
+         onerror="this.outerHTML='<span style=\'font-family:var(--futura);font-size:14px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.8)\'>CONSCIENCIA</span>'">
+    <div id="user-toggle">
+      <span>User:</span>
+      <button class="utoggle-btn" data-user="Emma">Emma</button>
+      <button class="utoggle-btn" data-user="TJ">TJ</button>
+    </div>
+  </div>
+
+  <!-- Main tabs -->
+  <div id="main-tabs">
+    <button class="main-tab active" data-tab="artists">Artists</button>
+    <button class="main-tab" data-tab="timetable">Timetable</button>
+  </div>
+
+  <!-- Content -->
+  <div id="content">
+
+    <!-- Artists page -->
+    <div id="artists-page">
+      <div id="day-tabs">
+        <div class="day-tab-group">
+          <button class="day-tab active" data-day="all">All</button>
+          <button class="day-tab" data-day="fri">Fri, July 25</button>
+          <button class="day-tab" data-day="sat">Sat, July 26</button>
+          <button class="day-tab" data-day="sun">Sun, July 27</button>
+        </div>
+        <div class="sort-group">
+          Sort:
+          <button class="sort-btn active" data-sort="stage">Stage</button>
+          <button class="sort-btn" data-sort="genre">Genre</button>
+        </div>
+      </div>
+      <div id="artists-container"></div>
+    </div>
+
+    <!-- Timetable page -->
+    <div id="timetable-page">
+      Coming Soon
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA — Weekend 2 artists by day, stage, with genre
+// Days mapped to W2 dates: Fri=July 25, Sat=July 26, Sun=July 27
+// (W1 is July 18-20, W2 is July 25-27 — adjusted from prompt's June dates)
+// ═══════════════════════════════════════════════════════════════
+
+const ARTISTS = [
+
+  // ── FRIDAY ─────────────────────────────────────────────────
+  // MAINSTAGE
+  { name: "Alok",               day: "fri", stage: "Mainstage",             genre: "Brazilian Bass" },
+  { name: "Ely Oaks",           day: "fri", stage: "Mainstage",             genre: "Progressive House" },
+  { name: "Hardwell",           day: "fri", stage: "Mainstage",             genre: "Big Room" },
+  { name: "Indira Paganotto",   day: "fri", stage: "Mainstage",             genre: "Techno" },
+  { name: "Kölsch",             day: "fri", stage: "Mainstage",             genre: "Melodic Techno" },
+  { name: "MC Stretch",         day: "fri", stage: "Mainstage",             genre: "MC / Jungle" },
+  { name: "Miss Monique",       day: "fri", stage: "Mainstage",             genre: "Melodic Techno" },
+  { name: "Nicky Romero",       day: "fri", stage: "Mainstage",             genre: "Progressive House" },
+  { name: "Steve Angello",      day: "fri", stage: "Mainstage",             genre: "Progressive House" },
+  { name: "Yves V",             day: "fri", stage: "Mainstage",             genre: "House" },
+
+  // FREEDOM BY BUD
+  { name: "Aaron Hibell",       day: "fri", stage: "Freedom by Bud",        genre: "Melodic Techno" },
+  { name: "Alesso",             day: "fri", stage: "Freedom by Bud",        genre: "Progressive House" },
+  { name: "Amber Broos b2b Juliet Fox", day: "fri", stage: "Freedom by Bud", genre: "Techno" },
+  { name: "Enrico Sangiuliano", day: "fri", stage: "Freedom by Bud",        genre: "Techno" },
+  { name: "Esin Boz",           day: "fri", stage: "Freedom by Bud",        genre: "Techno" },
+  { name: "Fisher",             day: "fri", stage: "Freedom by Bud",        genre: "Tech House" },
+  { name: "James Hype",         day: "fri", stage: "Freedom by Bud",        genre: "Tech House" },
+  { name: "JOA",                day: "fri", stage: "Freedom by Bud",        genre: "Tech House" },
+
+  // THE ROSE GARDEN (Bassrush)
+  { name: "ALLEYCVT",           day: "fri", stage: "The Rose Garden",       genre: "Dubstep" },
+  { name: "Basstripper",        day: "fri", stage: "The Rose Garden",       genre: "Dubstep" },
+  { name: "Borgore",            day: "fri", stage: "The Rose Garden",       genre: "Dubstep" },
+  { name: "BOU + B Live 247",   day: "fri", stage: "The Rose Garden",       genre: "Drum & Bass" },
+  { name: "Ghengar",            day: "fri", stage: "The Rose Garden",       genre: "Riddim" },
+  { name: "Goddard",            day: "fri", stage: "The Rose Garden",       genre: "Dubstep" },
+  { name: "Jessica Audiffred",  day: "fri", stage: "The Rose Garden",       genre: "Dubstep" },
+  { name: "LICIA",              day: "fri", stage: "The Rose Garden",       genre: "Dubstep" },
+  { name: "Lucky Luke",         day: "fri", stage: "The Rose Garden",       genre: "Dubstep" },
+  { name: "Riot Ten",           day: "fri", stage: "The Rose Garden",       genre: "Riddim" },
+  { name: "Shawiya Tribe",      day: "fri", stage: "The Rose Garden",       genre: "Dubstep" },
+  { name: "Sullivan King",      day: "fri", stage: "The Rose Garden",       genre: "Metalstep" },
+
+  // ELIXIR (Lemonade)
+  { name: "$hirak",             day: "fri", stage: "Elixir",                genre: "Afrohouse" },
+  { name: "Brooke Bailey b2b Taliyah Ayana", day: "fri", stage: "Elixir",  genre: "Afrohouse" },
+  { name: "Cham b2b Uneak",     day: "fri", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Dany Neville",       day: "fri", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Flash",              day: "fri", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Iris Rooth",         day: "fri", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Irwan",              day: "fri", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Miro",               day: "fri", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Nems",               day: "fri", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Rosh",               day: "fri", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Valentino Ignoto",   day: "fri", stage: "Elixir",               genre: "Afrohouse" },
+
+  // CAGE (Footworxx)
+  { name: "BAZZY",              day: "fri", stage: "Cage",                  genre: "Hardstyle" },
+  { name: "DJ Furax",           day: "fri", stage: "Cage",                  genre: "Hardcore" },
+  { name: "DRS b2b Sandy Warez",day: "fri", stage: "Cage",                  genre: "Hardcore" },
+  { name: "IMHAPPY",            day: "fri", stage: "Cage",                  genre: "Hardstyle" },
+  { name: "Lekkerfaces",        day: "fri", stage: "Cage",                  genre: "Hardstyle" },
+  { name: "Natte Visstick",     day: "fri", stage: "Cage",                  genre: "Hardcore" },
+  { name: "Partyraiser b2b Bulletproof", day: "fri", stage: "Cage",        genre: "Hardcore" },
+  { name: "Terrorclown",        day: "fri", stage: "Cage",                  genre: "Hardcore" },
+  { name: "Todiefor",           day: "fri", stage: "Cage",                  genre: "Hardstyle" },
+  { name: "Toxic Twins",        day: "fri", stage: "Cage",                  genre: "Hardcore" },
+  { name: "Yoshiko",            day: "fri", stage: "Cage",                  genre: "Hardstyle" },
+
+  // THE RAVE CAVE
+  { name: "Bisoux b2b Jef Nice",day: "fri", stage: "The Rave Cave",        genre: "Melodic Techno" },
+  { name: "Jared",              day: "fri", stage: "The Rave Cave",        genre: "Techno" },
+  { name: "Leesa",              day: "fri", stage: "The Rave Cave",        genre: "Techno" },
+  { name: "Lou8",               day: "fri", stage: "The Rave Cave",        genre: "Techno" },
+  { name: "Mairee",             day: "fri", stage: "The Rave Cave",        genre: "Melodic Techno" },
+  { name: "Mr. Joy",            day: "fri", stage: "The Rave Cave",        genre: "Techno" },
+  { name: "Sanne Dammers",      day: "fri", stage: "The Rave Cave",        genre: "Techno" },
+  { name: "VIKTÖR & MZDZ",      day: "fri", stage: "The Rave Cave",        genre: "Techno" },
+  { name: "Xijaro & Pitch",     day: "fri", stage: "The Rave Cave",        genre: "Trance" },
+
+  // PLANAXIS (Psygathering)
+  { name: "Avalon",             day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Beat Controllers",   day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Blastoyz",           day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Blazy",              day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Domi Re",            day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Electric Universe",  day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Firaga",             day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Locus",              day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Phaxe",              day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Somnia",             day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Vegas",              day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Vitor Falabella",    day: "fri", stage: "Planaxis",             genre: "Psytrance" },
+
+  // MELODIA BY CORONA (Disco Zonderdag)
+  { name: "Jeroen Delodder",    day: "fri", stage: "Melodia by Corona",    genre: "Disco / Nu-Disco" },
+  { name: "John Noseda",        day: "fri", stage: "Melodia by Corona",    genre: "Disco / Nu-Disco" },
+  { name: "Joulie",             day: "fri", stage: "Melodia by Corona",    genre: "Disco / Nu-Disco" },
+  { name: "Planet Groove DJ's", day: "fri", stage: "Melodia by Corona",    genre: "Disco / Nu-Disco" },
+  { name: "SPIES",              day: "fri", stage: "Melodia by Corona",    genre: "Disco / Nu-Disco" },
+
+  // CELESTIA BY KUCOIN (Cuckoo's Nest)
+  { name: "AAT",                day: "fri", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "Belters Only",       day: "fri", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "Gissa",              day: "fri", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "Mr. Belt & Wezol",   day: "fri", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "Ruze b2b Ranger Trucco", day: "fri", stage: "Celestia by KuCoin", genre: "House" },
+  { name: "Saar Kuus",          day: "fri", stage: "Celestia by KuCoin",   genre: "House" },
+
+  // ATMOSPHERE
+  { name: "Azyr",               day: "fri", stage: "Atmosphere",           genre: "Melodic Techno" },
+  { name: "BOY&GIRL",           day: "fri", stage: "Atmosphere",           genre: "Melodic House" },
+  { name: "Byorn",              day: "fri", stage: "Atmosphere",           genre: "Melodic Techno" },
+  { name: "Callush",            day: "fri", stage: "Atmosphere",           genre: "Melodic Techno" },
+  { name: "Dyen b2b Maddix",    day: "fri", stage: "Atmosphere",           genre: "Progressive House" },
+  { name: "Hannah Laing",       day: "fri", stage: "Atmosphere",           genre: "Drum & Bass" },
+  { name: "Holy Priest",        day: "fri", stage: "Atmosphere",           genre: "Melodic Techno" },
+  { name: "Mha Iri",            day: "fri", stage: "Atmosphere",           genre: "Melodic Techno" },
+  { name: "Onlynumbers",        day: "fri", stage: "Atmosphere",           genre: "Melodic House" },
+  { name: "Skeletor Yogi",      day: "fri", stage: "Atmosphere",           genre: "Melodic Techno" },
+
+  // CORE
+  { name: "Bibi Seck b2b Faisal", day: "fri", stage: "Core",              genre: "Tech House" },
+  { name: "Bullet Tooth",       day: "fri", stage: "Core",                 genre: "Techno" },
+  { name: "Fais Le Beau b2b Sixsixsixties", day: "fri", stage: "Core",    genre: "Tech House" },
+  { name: "Kamma",              day: "fri", stage: "Core",                 genre: "Techno" },
+  { name: "Mall Grab",          day: "fri", stage: "Core",                 genre: "Tech House" },
+  { name: "Ogazón",             day: "fri", stage: "Core",                 genre: "Techno" },
+  { name: "Oscar and the Wolf", day: "fri", stage: "Core",                 genre: "Indie Electronic" },
+
+  // CRYSTAL GARDEN
+  { name: "Capoon",             day: "fri", stage: "Crystal Garden",       genre: "Afro House" },
+  { name: "Deco",               day: "fri", stage: "Crystal Garden",       genre: "Afro House" },
+  { name: "Hugel",              day: "fri", stage: "Crystal Garden",       genre: "Tech House" },
+  { name: "Joezi",              day: "fri", stage: "Crystal Garden",       genre: "Afro House" },
+  { name: "Kitty Amor b2b Curol", day: "fri", stage: "Crystal Garden",    genre: "Afro House" },
+  { name: "Mahmut Orhan",       day: "fri", stage: "Crystal Garden",       genre: "Melodic House" },
+  { name: "Malive",             day: "fri", stage: "Crystal Garden",       genre: "Afro House" },
+  { name: "Shimza",             day: "fri", stage: "Crystal Garden",       genre: "Afro House" },
+
+  // THE GREAT LIBRARY
+  { name: "5NAPBACK",           day: "fri", stage: "The Great Library",    genre: "Drum & Bass" },
+  { name: "Alan Walker",        day: "fri", stage: "The Great Library",    genre: "Future Bass" },
+  { name: "B Jones",            day: "fri", stage: "The Great Library",    genre: "Drum & Bass" },
+  { name: "HALŌ",               day: "fri", stage: "The Great Library",    genre: "Melodic Dubstep" },
+  { name: "Illenium",           day: "fri", stage: "The Great Library",    genre: "Melodic Dubstep" },
+  { name: "Kaskade",            day: "fri", stage: "The Great Library",    genre: "Progressive House" },
+  { name: "MANDY",              day: "fri", stage: "The Great Library",    genre: "Techno" },
+  { name: "Meaghan",            day: "fri", stage: "The Great Library",    genre: "Drum & Bass" },
+  { name: "Merow",              day: "fri", stage: "The Great Library",    genre: "Drum & Bass" },
+  { name: "NOME.",              day: "fri", stage: "The Great Library",    genre: "Drum & Bass" },
+  { name: "Omdat Het Kan & Average Rob", day: "fri", stage: "The Great Library", genre: "House" },
+  { name: "Regi",               day: "fri", stage: "The Great Library",    genre: "Dance Pop" },
+
+  // MOOSE BAR
+  { name: "Jo Cox",             day: "fri", stage: "Moose Bar",            genre: "House" },
+  { name: "Prosit",             day: "fri", stage: "Moose Bar",            genre: "House" },
+  { name: "The Bobmeister",     day: "fri", stage: "Moose Bar",            genre: "House" },
+
+  // HOUSE OF FORTUNE BY JBL
+  { name: "Alan Alvarez & Crazy Sir-G", day: "fri", stage: "House of Fortune", genre: "Tech House" },
+  { name: "Didi Hahn",          day: "fri", stage: "House of Fortune",     genre: "Tech House" },
+  { name: "ELFIGO",             day: "fri", stage: "House of Fortune",     genre: "Tech House" },
+  { name: "Martin Trevy",       day: "fri", stage: "House of Fortune",     genre: "Tech House" },
+  { name: "MEGURU",             day: "fri", stage: "House of Fortune",     genre: "Tech House" },
+  { name: "Reygel",             day: "fri", stage: "House of Fortune",     genre: "Tech House" },
+  { name: "Telykast",           day: "fri", stage: "House of Fortune",     genre: "Melodic House" },
+  { name: "Vinne",              day: "fri", stage: "House of Fortune",     genre: "Tech House" },
+
+  // ── SATURDAY ────────────────────────────────────────────────
+  // MAINSTAGE
+  { name: "Agents of Time",     day: "sat", stage: "Mainstage",             genre: "Melodic Techno" },
+  { name: "Angemi",             day: "sat", stage: "Mainstage",             genre: "Techno" },
+  { name: "Armin van Buuren",   day: "sat", stage: "Mainstage",             genre: "Trance" },
+  { name: "Calvin Harris",      day: "sat", stage: "Mainstage",             genre: "House" },
+  { name: "D.O.D",              day: "sat", stage: "Mainstage",             genre: "Big Room" },
+  { name: "Dimitri Vegas & Like Mike", day: "sat", stage: "Mainstage",     genre: "Big Room" },
+  { name: "MATTN",              day: "sat", stage: "Mainstage",             genre: "Big Room" },
+  { name: "Mike Williams",      day: "sat", stage: "Mainstage",             genre: "Future House" },
+  { name: "Morten",             day: "sat", stage: "Mainstage",             genre: "Future Rave" },
+  { name: "Sub Zero Project",   day: "sat", stage: "Mainstage",             genre: "Rawstyle" },
+
+  // FREEDOM BY BUD
+  { name: "Andromedik",         day: "sat", stage: "Freedom by Bud",        genre: "Drum & Bass" },
+  { name: "Argy",               day: "sat", stage: "Freedom by Bud",        genre: "Melodic Techno" },
+  { name: "Calao",              day: "sat", stage: "Freedom by Bud",        genre: "Melodic Techno" },
+  { name: "Massano",            day: "sat", stage: "Freedom by Bud",        genre: "Melodic Techno" },
+  { name: "Mosimann b2b ELFIGO",day: "sat", stage: "Freedom by Bud",        genre: "Tech House" },
+  { name: "Romy Janssen",       day: "sat", stage: "Freedom by Bud",        genre: "Melodic Techno" },
+  { name: "Sebastian Ingrosso", day: "sat", stage: "Freedom by Bud",        genre: "Progressive House" },
+  { name: "Symphony Of Unity",  day: "sat", stage: "Freedom by Bud",        genre: "Trance" },
+  { name: "Timmy Trumpet",      day: "sat", stage: "Freedom by Bud",        genre: "Hardstyle" },
+
+  // THE ROSE GARDEN (Cherry Moon tribute)
+  { name: "BountyHunter",       day: "sat", stage: "The Rose Garden",       genre: "Hardstyle" },
+  { name: "Cherry Moon Legends (& Friends)", day: "sat", stage: "The Rose Garden", genre: "Rave / Hardcore" },
+  { name: "Danny Corten",       day: "sat", stage: "The Rose Garden",       genre: "Rave / Hardcore" },
+  { name: "Dimitri Cooman",     day: "sat", stage: "The Rose Garden",       genre: "Rave / Hardcore" },
+  { name: "DJ Ghost",           day: "sat", stage: "The Rose Garden",       genre: "Rave / Hardcore" },
+  { name: "Franky Kloeck",      day: "sat", stage: "The Rose Garden",       genre: "Rave / Hardcore" },
+  { name: "Jamie Dill",         day: "sat", stage: "The Rose Garden",       genre: "Hardstyle" },
+  { name: "Maite Dedecker",     day: "sat", stage: "The Rose Garden",       genre: "Rave / Hardcore" },
+  { name: "Quincy",             day: "sat", stage: "The Rose Garden",       genre: "Hardstyle" },
+  { name: "Youri Parker",       day: "sat", stage: "The Rose Garden",       genre: "Rave / Hardcore" },
+
+  // ELIXIR
+  { name: "Annabel Stop It",    day: "sat", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Butterfly Effect",   day: "sat", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "DJ ART",             day: "sat", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Eimco",              day: "sat", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Knox Kind",          day: "sat", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Lady S",             day: "sat", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Nina Black",         day: "sat", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "NOA",                day: "sat", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "RUBY XX",            day: "sat", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Sandersville",       day: "sat", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Shoarma Soundsystem",day: "sat", stage: "Elixir",               genre: "Afrohouse" },
+
+  // CAGE (Rave Alert)
+  { name: "IOSIO",              day: "sat", stage: "Cage",                  genre: "Hardstyle" },
+  { name: "Macon",              day: "sat", stage: "Cage",                  genre: "Hardstyle" },
+  { name: "Mero b2b Daire",     day: "sat", stage: "Cage",                  genre: "Hardstyle" },
+  { name: "Mondello",           day: "sat", stage: "Cage",                  genre: "Hardstyle" },
+  { name: "Niotech",            day: "sat", stage: "Cage",                  genre: "Hardstyle" },
+  { name: "Rune Evens",         day: "sat", stage: "Cage",                  genre: "Hardstyle" },
+  { name: "Stanne",             day: "sat", stage: "Cage",                  genre: "Hardstyle" },
+  { name: "Uberjak'd feat Ella Young", day: "sat", stage: "Cage",          genre: "Hardstyle" },
+  { name: "X&Trick",            day: "sat", stage: "Cage",                  genre: "Hardstyle" },
+
+  // THE RAVE CAVE
+  { name: "Flowchief",          day: "sat", stage: "The Rave Cave",        genre: "Techno" },
+  { name: "Jorn Pricez",        day: "sat", stage: "The Rave Cave",        genre: "Techno" },
+  { name: "Justin Wilkes",      day: "sat", stage: "The Rave Cave",        genre: "Techno" },
+  { name: "Netherworld",        day: "sat", stage: "The Rave Cave",        genre: "Techno" },
+  { name: "Pat Krimson",        day: "sat", stage: "The Rave Cave",        genre: "Trance" },
+  { name: "Roma",               day: "sat", stage: "The Rave Cave",        genre: "Techno" },
+  { name: "Simon B",            day: "sat", stage: "The Rave Cave",        genre: "Techno" },
+
+  // PLANAXIS
+  { name: "Alicia Hahn",        day: "sat", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Colyn b2b Sainte Vie", day: "sat", stage: "Planaxis",           genre: "Melodic Techno" },
+  { name: "Dyzen",              day: "sat", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "NA:TUS",             day: "sat", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Tim Bliss",          day: "sat", stage: "Planaxis",             genre: "Psytrance" },
+  { name: "Yet More",           day: "sat", stage: "Planaxis",             genre: "Melodic Techno" },
+  { name: "Yulia Niko",         day: "sat", stage: "Planaxis",             genre: "Melodic Techno" },
+
+  // MELODIA (Geheimzinnig)
+  { name: "Emilia De La Paz",   day: "sat", stage: "Melodia by Corona",    genre: "Disco / Nu-Disco" },
+  { name: "Geheimzinnig Soundsystem", day: "sat", stage: "Melodia by Corona", genre: "Disco / Nu-Disco" },
+  { name: "Larry Masmero",      day: "sat", stage: "Melodia by Corona",    genre: "Disco / Nu-Disco" },
+  { name: "Mooris",             day: "sat", stage: "Melodia by Corona",    genre: "Disco / Nu-Disco" },
+  { name: "Sam Girling",        day: "sat", stage: "Melodia by Corona",    genre: "Disco / Nu-Disco" },
+  { name: "Séa",                day: "sat", stage: "Melodia by Corona",    genre: "Disco / Nu-Disco" },
+  { name: "Soulastico b2b Tohma", day: "sat", stage: "Melodia by Corona",  genre: "Disco / Nu-Disco" },
+
+  // CELESTIA (2010-2012)
+  { name: "Bingo Players with Iceman", day: "sat", stage: "Celestia by KuCoin", genre: "Electro House" },
+  { name: "Chocolate Puma",     day: "sat", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "Dada Life",          day: "sat", stage: "Celestia by KuCoin",   genre: "Electro House" },
+  { name: "Dannic b2b Dyro",    day: "sat", stage: "Celestia by KuCoin",   genre: "Big Room" },
+  { name: "Gregor Salto",       day: "sat", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "LNY TNZ",            day: "sat", stage: "Celestia by KuCoin",   genre: "Rawstyle" },
+  { name: "Odssey",             day: "sat", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "Sander van Doorn",   day: "sat", stage: "Celestia by KuCoin",   genre: "Trance" },
+  { name: "Swanky Tunes",       day: "sat", stage: "Celestia by KuCoin",   genre: "Electro House" },
+  { name: "Yamo",               day: "sat", stage: "Celestia by KuCoin",   genre: "House" },
+
+  // ATMOSPHERE
+  { name: "2hot2play",          day: "sat", stage: "Atmosphere",           genre: "Techno" },
+  { name: "Alt8",               day: "sat", stage: "Atmosphere",           genre: "Melodic Techno" },
+  { name: "EMILIJA b2b Fenrick",day: "sat", stage: "Atmosphere",           genre: "Techno" },
+  { name: "I Hate Models",      day: "sat", stage: "Atmosphere",           genre: "Techno" },
+  { name: "Kneiz",              day: "sat", stage: "Atmosphere",           genre: "Techno" },
+  { name: "Noise Mafia",        day: "sat", stage: "Atmosphere",           genre: "Techno" },
+  { name: "Novah",              day: "sat", stage: "Atmosphere",           genre: "Melodic Techno" },
+  { name: "Pegassi",            day: "sat", stage: "Atmosphere",           genre: "Techno" },
+
+  // CORE
+  { name: "Dc Noises b2b Tori Ann", day: "sat", stage: "Core",            genre: "Tech House" },
+  { name: "Dino Lenny b2b Radioslave", day: "sat", stage: "Core",         genre: "Techno" },
+  { name: "HAAi b2b The Blessed Madonna", day: "sat", stage: "Core",      genre: "Techno" },
+  { name: "SHEE",               day: "sat", stage: "Core",                 genre: "Tech House" },
+
+  // CRYSTAL GARDEN (Experts Only)
+  { name: "Ayybo b2b Odd Mob",  day: "sat", stage: "Crystal Garden",      genre: "Tech House" },
+  { name: "GUZ",                day: "sat", stage: "Crystal Garden",       genre: "Tech House" },
+  { name: "HI-LO b2b Layton Giordani", day: "sat", stage: "Crystal Garden", genre: "Tech House" },
+  { name: "John Summit",        day: "sat", stage: "Crystal Garden",       genre: "Tech House" },
+  { name: "LP Giobbi",          day: "sat", stage: "Crystal Garden",       genre: "Tech House" },
+  { name: "Max Styler",         day: "sat", stage: "Crystal Garden",       genre: "Tech House" },
+  { name: "Naomi Cazier",       day: "sat", stage: "Crystal Garden",       genre: "Tech House" },
+  { name: "Roddy Lima",         day: "sat", stage: "Crystal Garden",       genre: "Tech House" },
+
+  // THE GREAT LIBRARY (Lost Frequencies & Friends)
+  { name: "Chris Lorenzo",      day: "sat", stage: "The Great Library",    genre: "Tech House" },
+  { name: "Gorgon City",        day: "sat", stage: "The Great Library",    genre: "House" },
+  { name: "Henri PFR",          day: "sat", stage: "The Great Library",    genre: "Melodic House" },
+  { name: "Lost Frequencies",   day: "sat", stage: "The Great Library",    genre: "Melodic House" },
+  { name: "me n ü",             day: "sat", stage: "The Great Library",    genre: "Melodic House" },
+  { name: "Mesto",              day: "sat", stage: "The Great Library",    genre: "Future House" },
+  { name: "Netsky",             day: "sat", stage: "The Great Library",    genre: "Drum & Bass" },
+  { name: "Radio Cargo",        day: "sat", stage: "The Great Library",    genre: "Tech House" },
+  { name: "Sonny Fodera",       day: "sat", stage: "The Great Library",    genre: "Tech House" },
+  { name: "Wilkinson",          day: "sat", stage: "The Great Library",    genre: "Drum & Bass" },
+  { name: "ZHU",                day: "sat", stage: "The Great Library",    genre: "Deep House" },
+
+  // MOOSE BAR
+  { name: "Kurt Verheyen",      day: "sat", stage: "Moose Bar",            genre: "House" },
+  { name: "Mobius One",         day: "sat", stage: "Moose Bar",            genre: "House" },
+  { name: "Mr E.",              day: "sat", stage: "Moose Bar",            genre: "House" },
+
+  // ── SUNDAY ──────────────────────────────────────────────────
+  // MAINSTAGE
+  { name: "Afrojack b2b R3hab", day: "sun", stage: "Mainstage",             genre: "Big Room" },
+  { name: "Chase & Status (DJ set)", day: "sun", stage: "Mainstage",        genre: "Drum & Bass" },
+  { name: "Cyril",              day: "sun", stage: "Mainstage",             genre: "House" },
+  { name: "Lost Frequencies",   day: "sun", stage: "Mainstage",             genre: "Melodic House" },
+  { name: "Lucas & Steve",      day: "sun", stage: "Mainstage",             genre: "Progressive House" },
+  { name: "Martin Garrix",      day: "sun", stage: "Mainstage",             genre: "Progressive House" },
+  { name: "MC Stretch",         day: "sun", stage: "Mainstage",             genre: "MC / Jungle" },
+  { name: "Odd Mob",            day: "sun", stage: "Mainstage",             genre: "Tech House" },
+  { name: "Sara Landry",        day: "sun", stage: "Mainstage",             genre: "Techno" },
+  { name: "Steve Aoki",         day: "sun", stage: "Mainstage",             genre: "Electro House" },
+
+  // FREEDOM BY BUD
+  { name: "Amelie Lens presents Aura", day: "sun", stage: "Freedom by Bud", genre: "Techno" },
+  { name: "Artbat",             day: "sun", stage: "Freedom by Bud",        genre: "Melodic Techno" },
+  { name: "Axel Haube",         day: "sun", stage: "Freedom by Bud",        genre: "Melodic Techno" },
+  { name: "Fideles",            day: "sun", stage: "Freedom by Bud",        genre: "Melodic Techno" },
+  { name: "Korolova",           day: "sun", stage: "Freedom by Bud",        genre: "Melodic Techno" },
+  { name: "Laura Hoogland",     day: "sun", stage: "Freedom by Bud",        genre: "Melodic Techno" },
+  { name: "Push Only",          day: "sun", stage: "Freedom by Bud",        genre: "Melodic Techno" },
+
+  // THE ROSE GARDEN (Tweekamania)
+  { name: "BassBrain",          day: "sun", stage: "The Rose Garden",       genre: "Rawstyle" },
+  { name: "Coone",              day: "sun", stage: "The Rose Garden",       genre: "Hardstyle" },
+  { name: "D-Charged b2b Serzo",day: "sun", stage: "The Rose Garden",       genre: "Hardstyle" },
+  { name: "Da Tweekaz",         day: "sun", stage: "The Rose Garden",       genre: "Hardstyle" },
+  { name: "Hard Driver",        day: "sun", stage: "The Rose Garden",       genre: "Rawstyle" },
+  { name: "Lost Identity",      day: "sun", stage: "The Rose Garden",       genre: "Hardstyle" },
+  { name: "Mark With A K & MC Chucky", day: "sun", stage: "The Rose Garden", genre: "Hardstyle" },
+  { name: "Sound Rush",         day: "sun", stage: "The Rose Garden",       genre: "Hardstyle" },
+  { name: "The Purge",          day: "sun", stage: "The Rose Garden",       genre: "Rawstyle" },
+  { name: "The Straikerz",      day: "sun", stage: "The Rose Garden",       genre: "Hardstyle" },
+  { name: "Villain",            day: "sun", stage: "The Rose Garden",       genre: "Hardstyle" },
+  { name: "Warface",            day: "sun", stage: "The Rose Garden",       genre: "Rawstyle" },
+
+  // ELIXIR (Team Amani)
+  { name: "Dino",               day: "sun", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Jaël Ost & MagiK",  day: "sun", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Karakals",           day: "sun", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Kav Verhouzer & de Hofnar", day: "sun", stage: "Elixir",        genre: "Eurodance" },
+  { name: "Lennert Wolfs",      day: "sun", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Michael Amani",      day: "sun", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Michael Amani & Friends", day: "sun", stage: "Elixir",          genre: "Afrohouse" },
+  { name: "Reeze",              day: "sun", stage: "Elixir",               genre: "Afrohouse" },
+  { name: "Vikkstar",           day: "sun", stage: "Elixir",               genre: "House" },
+
+  // CAGE
+  { name: "Amalie",             day: "sun", stage: "Cage",                  genre: "Techno" },
+  { name: "Amotik",             day: "sun", stage: "Cage",                  genre: "Techno" },
+  { name: "Blasha & Allatt",    day: "sun", stage: "Cage",                  genre: "Techno" },
+  { name: "Freddy K",           day: "sun", stage: "Cage",                  genre: "Techno" },
+  { name: "Netty Hugo",         day: "sun", stage: "Cage",                  genre: "Techno" },
+  { name: "Quelza",             day: "sun", stage: "Cage",                  genre: "Techno" },
+
+  // THE RAVE CAVE
+  { name: "Benny Plays",        day: "sun", stage: "The Rave Cave",        genre: "House" },
+  { name: "D. Guaetta b2b Neon",day: "sun", stage: "The Rave Cave",        genre: "House" },
+  { name: "EME",                day: "sun", stage: "The Rave Cave",        genre: "House" },
+  { name: "Hyalyte",            day: "sun", stage: "The Rave Cave",        genre: "Melodic Techno" },
+  { name: "Kriss Reeve",        day: "sun", stage: "The Rave Cave",        genre: "House" },
+  { name: "Mr. Rewind",         day: "sun", stage: "The Rave Cave",        genre: "House" },
+  { name: "Muze",               day: "sun", stage: "The Rave Cave",        genre: "House" },
+
+  // PLANAXIS (2010-2012 / Super You & Me)
+  { name: "ANAYA",              day: "sun", stage: "Planaxis",             genre: "House" },
+  { name: "Chuckie",            day: "sun", stage: "Planaxis",             genre: "Electro House" },
+  { name: "Deorro",             day: "sun", stage: "Planaxis",             genre: "Electro House" },
+  { name: "Laidback Luke",      day: "sun", stage: "Planaxis",             genre: "Electro House" },
+  { name: "Okayval",            day: "sun", stage: "Planaxis",             genre: "House" },
+  { name: "Olivex",             day: "sun", stage: "Planaxis",             genre: "House" },
+  { name: "Quintino",           day: "sun", stage: "Planaxis",             genre: "Big Room" },
+  { name: "Sick Individuals",   day: "sun", stage: "Planaxis",             genre: "Progressive House" },
+  { name: "Superheroes",        day: "sun", stage: "Planaxis",             genre: "Electro House" },
+  { name: "Thomas Gold",        day: "sun", stage: "Planaxis",             genre: "Progressive House" },
+  { name: "Yves V b2b StadiumX",day: "sun", stage: "Planaxis",             genre: "Big Room" },
+
+  // MELODIA (With Love From Ibiza)
+  { name: "Alex Kennon",        day: "sun", stage: "Melodia by Corona",    genre: "Organic House" },
+  { name: "Bobbi Antonni",      day: "sun", stage: "Melodia by Corona",    genre: "Organic House" },
+  { name: "Cristiano Da Silva", day: "sun", stage: "Melodia by Corona",    genre: "Organic House" },
+  { name: "Delafino & Luna Fino", day: "sun", stage: "Melodia by Corona",  genre: "Organic House" },
+  { name: "Dominico",           day: "sun", stage: "Melodia by Corona",    genre: "Organic House" },
+  { name: "Eli Rojas",          day: "sun", stage: "Melodia by Corona",    genre: "Organic House" },
+  { name: "Oriol Calvo",        day: "sun", stage: "Melodia by Corona",    genre: "Organic House" },
+  { name: "Rayco Santos",       day: "sun", stage: "Melodia by Corona",    genre: "Organic House" },
+  { name: "Valentín Huedo",     day: "sun", stage: "Melodia by Corona",    genre: "Organic House" },
+
+  // CELESTIA
+  { name: "Bella Claxton b2b Paige Tomlinson", day: "sun", stage: "Celestia by KuCoin", genre: "House" },
+  { name: "HU",                 day: "sun", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "Kyle Starkey",       day: "sun", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "Lisa Korver",        day: "sun", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "Mendosa",            day: "sun", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "Morgan Seatree",     day: "sun", stage: "Celestia by KuCoin",   genre: "House" },
+  { name: "Newtone",            day: "sun", stage: "Celestia by KuCoin",   genre: "House" },
+
+  // ATMOSPHERE
+  { name: "Adrián Mills",       day: "sun", stage: "Atmosphere",           genre: "Melodic Techno" },
+  { name: "Alycia Bezgo b2b Biianco", day: "sun", stage: "Atmosphere",    genre: "Techno" },
+  { name: "Kobosil",            day: "sun", stage: "Atmosphere",           genre: "Techno" },
+  { name: "Mirage",             day: "sun", stage: "Atmosphere",           genre: "Melodic Techno" },
+  { name: "Nikolina",           day: "sun", stage: "Atmosphere",           genre: "Techno" },
+  { name: "Portex",             day: "sun", stage: "Atmosphere",           genre: "Techno" },
+  { name: "Riana Holley",       day: "sun", stage: "Atmosphere",           genre: "Techno" },
+  { name: "Trym",               day: "sun", stage: "Atmosphere",           genre: "Techno" },
+
+  // CORE
+  { name: "Benwal b2b Labat",   day: "sun", stage: "Core",                 genre: "Tech House" },
+  { name: "Catalina",           day: "sun", stage: "Core",                 genre: "Tech House" },
+  { name: "Helena Lauwaert",    day: "sun", stage: "Core",                 genre: "Techno" },
+  { name: "Kellar",             day: "sun", stage: "Core",                 genre: "Techno" },
+  { name: "Lammer",             day: "sun", stage: "Core",                 genre: "Techno" },
+  { name: "Malugi",             day: "sun", stage: "Core",                 genre: "Techno" },
+  { name: "Saidah",             day: "sun", stage: "Core",                 genre: "Techno" },
+
+  // CRYSTAL GARDEN
+  { name: "Bhaskar",            day: "sun", stage: "Crystal Garden",       genre: "Afro House" },
+  { name: "Brina Knauss",       day: "sun", stage: "Crystal Garden",       genre: "Melodic Techno" },
+  { name: "Franc Fala b2b Benja", day: "sun", stage: "Crystal Garden",    genre: "Melodic House" },
+  { name: "Kevin de Vries b2b Meduza", day: "sun", stage: "Crystal Garden", genre: "Melodic Techno" },
+  { name: "Like Mike",          day: "sun", stage: "Crystal Garden",       genre: "Tech House" },
+  { name: "Mind Against",       day: "sun", stage: "Crystal Garden",       genre: "Melodic Techno" },
+
+  // THE GREAT LIBRARY (Smash The House)
+  { name: "Bassjackers",        day: "sun", stage: "The Great Library",    genre: "Big Room" },
+  { name: "Brennan Heart",      day: "sun", stage: "The Great Library",    genre: "Hardstyle" },
+  { name: "Darren Styles",      day: "sun", stage: "The Great Library",    genre: "Hardstyle" },
+  { name: "Diego Miranda b2b Jerry Davila", day: "sun", stage: "The Great Library", genre: "Tech House" },
+  { name: "Kaaze",              day: "sun", stage: "The Great Library",    genre: "Future Rave" },
+  { name: "Lucca van Damme",    day: "sun", stage: "The Great Library",    genre: "Big Room" },
+  { name: "NERVO",              day: "sun", stage: "The Great Library",    genre: "Electro House" },
+  { name: "Nico Moreno",        day: "sun", stage: "The Great Library",    genre: "Techno" },
+  { name: "Paris Hilton",       day: "sun", stage: "The Great Library",    genre: "House" },
+
+  // MOOSE BAR
+  { name: "Brian",              day: "sun", stage: "Moose Bar",            genre: "House" },
+  { name: "Jan V",              day: "sun", stage: "Moose Bar",            genre: "House" },
+  { name: "Mr E.",              day: "sun", stage: "Moose Bar",            genre: "House" },
+
+  // HOUSE OF FORTUNE BY JBL
+  { name: "Bassjackers",        day: "sun", stage: "House of Fortune",     genre: "Big Room" },
+  { name: "DJ F.R.A.N.K",      day: "sun", stage: "House of Fortune",     genre: "House" },
+  { name: "DJ Lex",             day: "sun", stage: "House of Fortune",     genre: "House" },
+  { name: "The Criminal Sounds",day: "sun", stage: "House of Fortune",     genre: "Tech House" },
+  { name: "The Rocketman",      day: "sun", stage: "House of Fortune",     genre: "House" },
+  { name: "TIGERLILY",          day: "sun", stage: "House of Fortune",     genre: "House" },
+  { name: "Triciaa",            day: "sun", stage: "House of Fortune",     genre: "House" },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let state = {
+  currentUser: null,   // 'Emma' | 'TJ'
+  likes: {},           // { "name_day": { emma: bool, tj: bool } }
+  activeDay: 'all',
+  sortMode: 'stage',   // 'stage' | 'genre'
+};
+
+// unique key per artist
+function artistKey(a) { return `${a.name}__${a.day}`; }
+
+function getLikeState(a) {
+  const k = artistKey(a);
+  const l = state.likes[k] || {};
+  if (l.emma && l.tj) return 'both';
+  if (l.emma) return 'emma';
+  if (l.tj) return 'tj';
+  return 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ENTRY FLOW
+// ═══════════════════════════════════════════════════════════════
+const CORRECT_PW = 'bb';
+
+document.getElementById('entry-btn').addEventListener('click', tryEnter);
+document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') tryEnter(); });
+
+function fadeOut(el, duration, cb) {
+  el.style.transition = `opacity ${duration}ms ease`;
+  el.style.opacity = '0';
+  setTimeout(cb, duration);
+}
+
+function fadeIn(el, duration) {
+  el.style.opacity = '0';
+  el.offsetHeight; // force reflow
+  el.style.transition = `opacity ${duration}ms ease`;
+  el.style.opacity = '1';
+}
+
+function tryEnter() {
+  const v = document.getElementById('pw-input').value.trim().toLowerCase();
+  if (v === CORRECT_PW) {
+    const entryEl = document.getElementById('entry-screen');
+    fadeOut(entryEl, 500, () => {
+      entryEl.classList.add('hidden');
+      const us = document.getElementById('user-screen');
+      us.style.display = 'flex';
+      fadeIn(us, 500);
+    });
+  } else {
+    document.getElementById('entry-error').style.opacity = '1';
+    document.getElementById('pw-input').value = '';
+    setTimeout(() => document.getElementById('entry-error').style.opacity = '0', 2000);
+  }
+}
+
+// User select
+let pendingUser = null;
+document.querySelectorAll('.user-oval-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.user-oval-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    pendingUser = btn.dataset.user;
+    document.getElementById('user-enter-btn').classList.add('visible');
+  });
+});
+
+document.getElementById('user-enter-btn').addEventListener('click', () => {
+  if (!pendingUser) return;
+  state.currentUser = pendingUser;
+  const us = document.getElementById('user-screen');
+  fadeOut(us, 500, () => {
+    us.style.display = 'none';
+    const app = document.getElementById('app');
+    app.style.display = 'flex';
+    fadeIn(app, 600);
+    updateUserToggle();
+    showArtistsPage();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// USER TOGGLE (in-app)
+// ═══════════════════════════════════════════════════════════════
+document.querySelectorAll('.utoggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.currentUser = btn.dataset.user;
+    updateUserToggle();
+    renderArtists();
+  });
+});
+
+function updateUserToggle() {
+  document.querySelectorAll('.utoggle-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.user === state.currentUser);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN TABS
+// ═══════════════════════════════════════════════════════════════
+document.querySelectorAll('.main-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    if (tab.dataset.tab === 'artists') {
+      showArtistsPage();
+    } else {
+      document.getElementById('artists-page').style.display = 'none';
+      const tp = document.getElementById('timetable-page');
+      tp.style.display = 'flex';
+    }
+  });
+});
+
+function showArtistsPage() {
+  document.getElementById('timetable-page').style.display = 'none';
+  document.getElementById('artists-page').style.display = 'block';
+  renderArtists();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DAY TABS
+// ═══════════════════════════════════════════════════════════════
+document.querySelectorAll('.day-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.activeDay = tab.dataset.day;
+    renderArtists();
+  });
+});
+
+// SORT BUTTONS
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.sortMode = btn.dataset.sort;
+    renderArtists();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// LIKE LOGIC
+// ═══════════════════════════════════════════════════════════════
+function toggleLike(artist) {
+  const k = artistKey(artist);
+  if (!state.likes[k]) state.likes[k] = { emma: false, tj: false };
+  if (state.currentUser === 'Emma') {
+    state.likes[k].emma = !state.likes[k].emma;
+  } else {
+    state.likes[k].tj = !state.likes[k].tj;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+const STAGE_ORDER = [
+  "Mainstage", "Freedom by Bud", "The Great Library", "Crystal Garden",
+  "Atmosphere", "Core", "Planaxis", "Celestia by KuCoin", "Melodia by Corona",
+  "The Rave Cave", "The Rose Garden", "Elixir", "Cage",
+  "House of Fortune", "Moose Bar"
+];
+
+function renderArtists() {
+  const container = document.getElementById('artists-container');
+  container.innerHTML = '';
+
+  const filtered = ARTISTS.filter(a => {
+    if (state.activeDay === 'all') return true;
+    return a.day === state.activeDay;
+  });
+
+  if (state.sortMode === 'stage') {
+    renderByStage(container, filtered);
+  } else {
+    renderByGenre(container, filtered);
+  }
+}
+
+function renderByStage(container, artists) {
+  // Group
+  const groups = {};
+  artists.forEach(a => {
+    if (!groups[a.stage]) groups[a.stage] = [];
+    groups[a.stage].push(a);
+  });
+
+  STAGE_ORDER.forEach(stage => {
+    const list = groups[stage];
+    if (!list || list.length === 0) return;
+
+    // day label if "all"
+    const header = document.createElement('div');
+    header.className = 'group-header';
+    header.textContent = stage.toUpperCase();
+    container.appendChild(header);
+
+    const pillsRow = document.createElement('div');
+    pillsRow.className = 'artist-pills';
+
+    list.forEach(artist => {
+      pillsRow.appendChild(makePill(artist, true)); // show genre in stage view
+    });
+    container.appendChild(pillsRow);
+  });
+}
+
+function renderByGenre(container, artists) {
+  const groups = {};
+  artists.forEach(a => {
+    if (!groups[a.genre]) groups[a.genre] = [];
+    groups[a.genre].push(a);
+  });
+
+  const sorted = Object.keys(groups).sort();
+  sorted.forEach(genre => {
+    const header = document.createElement('div');
+    header.className = 'group-header';
+    header.textContent = genre.toUpperCase();
+    container.appendChild(header);
+
+    const pillsRow = document.createElement('div');
+    pillsRow.className = 'artist-pills';
+    groups[genre].forEach(artist => {
+      pillsRow.appendChild(makePill(artist, false)); // no genre text in genre view
+    });
+    container.appendChild(pillsRow);
+  });
+}
+
+function makePill(artist, showGenre) {
+  const pill = document.createElement('div');
+  pill.className = 'artist-pill';
+
+  const likeState = getLikeState(artist);
+  if (likeState === 'emma') pill.classList.add('liked-emma');
+  else if (likeState === 'tj') pill.classList.add('liked-tj');
+  else if (likeState === 'both') pill.classList.add('liked-both');
+
+  const nameEl = document.createElement('span');
+  nameEl.className = 'pill-name';
+  nameEl.textContent = artist.name;
+  pill.appendChild(nameEl);
+
+  if (showGenre) {
+    const genreEl = document.createElement('span');
+    genreEl.className = 'pill-genre';
+    genreEl.textContent = artist.genre;
+    pill.appendChild(genreEl);
+  }
+
+  pill.addEventListener('click', () => {
+    toggleLike(artist);
+    renderArtists();
+  });
+
+  return pill;
+}
+</script>
+</body>
+</html>
