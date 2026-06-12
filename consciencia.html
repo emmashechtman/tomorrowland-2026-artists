@@ -869,12 +869,28 @@ const ARTISTS = [
 // ═══════════════════════════════════════════════════════════════
 const STORAGE_KEY = 'consciencia_likes';
 
+function encodeLikes(likes) {
+  try { return btoa(unescape(encodeURIComponent(JSON.stringify(likes)))); } catch { return ''; }
+}
+
+function decodeLikes(str) {
+  try { return JSON.parse(decodeURIComponent(escape(atob(str)))); } catch { return null; }
+}
+
 function loadLikes() {
+  const hash = window.location.hash.slice(1);
+  if (hash) {
+    const fromHash = decodeLikes(hash);
+    if (fromHash && typeof fromHash === 'object') return fromHash;
+  }
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
 }
 
 function saveLikes() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.likes)); } catch {}
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.likes));
+    history.replaceState(null, '', '#' + encodeLikes(state.likes));
+  } catch {}
 }
 
 let state = {
