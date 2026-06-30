@@ -300,14 +300,80 @@
   .artist-pill.liked-both .pill-name { color: #fff; font-weight: 700; }
   .artist-pill.liked-both .pill-genre { color: rgba(255,255,255,0.65); }
 
-  /* TIMETABLE placeholder */
-  #timetable-page {
-    display: none; align-items: center; justify-content: center;
-    height: 100%; min-height: 60vh;
-    font-family: var(--futura); font-style: italic;
-    font-size: clamp(28px, 6vw, 52px); color: rgba(255,255,255,0.18);
-    letter-spacing: 2px;
+  /* TIMETABLE */
+  #timetable-page { display: none; padding: 0; }
+  #tt-day-tabs {
+    display: flex; gap: 8px; padding: 14px 20px 10px;
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(16,16,16,0.92);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
   }
+  .tt-day-tab {
+    font-family: var(--futura); font-size: 11px; font-weight: 700;
+    letter-spacing: 1.2px; cursor: pointer; text-transform: uppercase;
+    background: transparent; border: 1.5px solid rgba(255,255,255,0.18);
+    border-radius: 50px; color: rgba(255,255,255,0.4);
+    padding: 6px 18px; transition: all .15s;
+  }
+  .tt-day-tab.active { background: var(--white); border-color: var(--white); color: #111; }
+  .tt-day-tab:hover:not(.active) { color: rgba(255,255,255,.7); border-color: rgba(255,255,255,.4); }
+
+  #tt-scroll { overflow-x: auto; overflow-y: hidden; padding: 6px 0 28px; }
+  #tt-grid { min-width: max-content; }
+
+  .tt-axis { display: flex; height: 26px; }
+  .tt-axis-spacer {
+    flex: 0 0 120px; position: sticky; left: 0; z-index: 6;
+    background: #0d0d0d;
+  }
+  .tt-axis-track { position: relative; height: 100%; }
+  .tt-tick {
+    position: absolute; top: 5px; transform: translateX(-50%);
+    font-family: var(--futura); font-size: 10px; letter-spacing: .5px;
+    color: rgba(255,255,255,0.4); white-space: nowrap;
+  }
+
+  .tt-row { display: flex; align-items: stretch; }
+  .tt-stage-label {
+    flex: 0 0 120px; position: sticky; left: 0; z-index: 6;
+    background: #0d0d0d;
+    display: flex; align-items: center;
+    font-family: var(--futura); font-size: 9px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    padding: 0 10px; border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .tt-track {
+    position: relative; min-height: 56px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    background: repeating-linear-gradient(to right,
+      rgba(255,255,255,0.045) 0 1px, transparent 1px 120px);
+  }
+  .tt-block {
+    position: absolute; top: 5px; bottom: 5px;
+    background: rgba(255,255,255,0.92);
+    border-radius: 8px; padding: 4px 8px; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center;
+    cursor: pointer; border: 1.5px solid transparent;
+    transition: box-shadow .15s, transform .1s;
+  }
+  .tt-block:active { transform: scale(0.97); }
+  .tt-name {
+    font-family: var(--futura); font-size: 11px; font-weight: 700;
+    color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    line-height: 1.15;
+  }
+  .tt-time {
+    font-family: var(--futura); font-size: 9px; color: rgba(0,0,0,0.55);
+    white-space: nowrap; margin-top: 2px;
+  }
+  .tt-block.tt-static { cursor: default; background: rgba(255,255,255,0.45); }
+  .tt-block.tt-static .tt-name { color: rgba(0,0,0,0.7); font-weight: 600; }
+  .tt-block.liked-emma { background: var(--pink); box-shadow: 0 0 16px rgba(255,154,213,0.75); border-color: #fff; }
+  .tt-block.liked-tj   { background: var(--blue); box-shadow: 0 0 16px rgba(125,211,245,0.75); border-color: #fff; }
+  .tt-block.liked-both { background: var(--purple); box-shadow: 0 0 16px rgba(201,126,255,0.8); border-color: #fff; }
+  .tt-block.liked-both .tt-name { color: #fff; }
+  .tt-block.liked-both .tt-time { color: rgba(255,255,255,0.7); }
 
   /* LIKED PAGE */
   #liked-page { display: none; padding: 20px; }
@@ -405,9 +471,9 @@
       <div id="day-tabs">
         <div class="day-tab-group">
           <button class="day-tab active" data-day="all">All</button>
-          <button class="day-tab" data-day="fri">Fri, July 25</button>
-          <button class="day-tab" data-day="sat">Sat, July 26</button>
-          <button class="day-tab" data-day="sun">Sun, July 27</button>
+          <button class="day-tab" data-day="fri">Fri, July 24</button>
+          <button class="day-tab" data-day="sat">Sat, July 25</button>
+          <button class="day-tab" data-day="sun">Sun, July 26</button>
         </div>
         <div class="sort-group">
           Sort:
@@ -438,7 +504,14 @@
 
     <!-- Timetable page -->
     <div id="timetable-page">
-      Coming Soon
+      <div id="tt-day-tabs">
+        <button class="tt-day-tab active" data-day="fri">Fri 24 Jul</button>
+        <button class="tt-day-tab" data-day="sat">Sat 25 Jul</button>
+        <button class="tt-day-tab" data-day="sun">Sun 26 Jul</button>
+      </div>
+      <div id="tt-scroll">
+        <div id="tt-grid"></div>
+      </div>
     </div>
 
   </div>
@@ -910,6 +983,442 @@ const ARTISTS = [
 ];
 
 // ═══════════════════════════════════════════════════════════════
+// TIMETABLE SCHEDULE — start/end times per artist, per stage, per day
+// Transcribed from official set-time grids. Names match ARTISTS exactly
+// so likes stay synced across Artists / Liked / Timetable views.
+// Format: [day, stage, name, start, end, extra?]  (extra = not a likable
+// data artist, shown for completeness only)
+// ═══════════════════════════════════════════════════════════════
+const SCHEDULE_RAW = [
+  // ─── FRIDAY ───
+  ['fri','Mainstage','More to be announced','14:00','15:30',1],
+  ['fri','Mainstage','Ely Oaks','15:30','16:30'],
+  ['fri','Mainstage','Yves V','16:30','17:30'],
+  ['fri','Mainstage','Miss Monique','17:35','18:35'],
+  ['fri','Mainstage','Indira Paganotto','18:40','19:40'],
+  ['fri','Mainstage','Nicky Romero','19:40','20:40'],
+  ['fri','Mainstage','Kölsch','20:40','21:40'],
+  ['fri','Mainstage','Alok','21:45','22:45'],
+  ['fri','Mainstage','Steve Angello','22:50','23:50'],
+  ['fri','Mainstage','Hardwell','23:50','00:50'],
+
+  ['fri','Freedom by Bud','JOA','13:30','15:00'],
+  ['fri','Freedom by Bud','Aaron Hibell','15:00','16:00'],
+  ['fri','Freedom by Bud','Amber Broos b2b Juliet Fox','16:00','17:30'],
+  ['fri','Freedom by Bud','Enrico Sangiuliano','17:30','19:00'],
+  ['fri','Freedom by Bud','John Newman','19:00','20:00',1],
+  ['fri','Freedom by Bud','James Hype','20:30','21:30'],
+  ['fri','Freedom by Bud','Fisher','21:30','23:00'],
+  ['fri','Freedom by Bud','Alesso','23:00','00:30'],
+
+  ['fri','The Rose Garden','LICIA','13:30','15:00'],
+  ['fri','The Rose Garden','Lucky Luke','15:00','16:00'],
+  ['fri','The Rose Garden','Goddard','16:00','17:00'],
+  ['fri','The Rose Garden','Ghengar','17:00','18:00'],
+  ['fri','The Rose Garden','ALLEYCVT','18:00','19:00'],
+  ['fri','The Rose Garden','Basstripper','19:00','20:00'],
+  ['fri','The Rose Garden','Jessica Audiffred','20:00','21:00'],
+  ['fri','The Rose Garden','Riot Ten','21:00','22:00'],
+  ['fri','The Rose Garden','BOU + B Live 247','22:00','23:00'],
+  ['fri','The Rose Garden','Borgore','23:00','00:00'],
+  ['fri','The Rose Garden','Sullivan King','00:00','01:00'],
+
+  ['fri','Elixir','Rosh','13:00','14:30'],
+  ['fri','Elixir','Brooke Bailey b2b Taliyah Ayana','14:30','16:00'],
+  ['fri','Elixir','Valentino Ignoto','16:00','17:00'],
+  ['fri','Elixir','Iris Rooth','17:00','18:00'],
+  ['fri','Elixir','Miro','18:00','19:00'],
+  ['fri','Elixir','Nems','19:00','20:00'],
+  ['fri','Elixir','$hirak','20:00','21:00'],
+  ['fri','Elixir','Flash','21:00','22:00'],
+  ['fri','Elixir','Dany Neville','22:00','23:00'],
+  ['fri','Elixir','Irwan','23:00','00:00'],
+  ['fri','Elixir','Cham b2b Uneak','00:00','01:00'],
+
+  ['fri','Cage','Toxic Twins','13:00','14:00'],
+  ['fri','Cage','Todiefor','14:00','15:00'],
+  ['fri','Cage','IMHAPPY','15:00','16:00'],
+  ['fri','Cage','Natte Visstick','16:00','17:00'],
+  ['fri','Cage','DJ Furax','17:00','18:00'],
+  ['fri','Cage','Partyraiser b2b Bulletproof','18:00','19:00'],
+  ['fri','Cage','DRS b2b Sandy Warez','19:00','20:00'],
+  ['fri','Cage','Lekkerfaces','20:00','21:00'],
+  ['fri','Cage','Yoshiko','21:00','22:00'],
+  ['fri','Cage','Terrorclown','22:00','23:00'],
+
+  ['fri','The Rave Cave','Sanne Dammers','13:00','14:30'],
+  ['fri','The Rave Cave','Leesa','14:30','16:00'],
+  ['fri','The Rave Cave','VIKTÖR & MZDZ','16:00','17:30'],
+  ['fri','The Rave Cave','Lou8','17:30','18:30'],
+  ['fri','The Rave Cave','Jared','18:30','19:30'],
+  ['fri','The Rave Cave','Xijaro & Pitch','19:30','20:30'],
+  ['fri','The Rave Cave','Mr. Joy','20:30','22:00'],
+  ['fri','The Rave Cave','Mairee','22:00','23:00'],
+  ['fri','The Rave Cave','Bisoux b2b Jef Nice','23:00','00:00'],
+
+  ['fri','Planaxis','Domi Re','13:00','14:00'],
+  ['fri','Planaxis','Beat Controllers','14:00','15:00'],
+  ['fri','Planaxis','Vitor Falabella','15:00','16:00'],
+  ['fri','Planaxis','Firaga','16:00','17:00'],
+  ['fri','Planaxis','Somnia','17:00','18:00'],
+  ['fri','Planaxis','Phaxe','18:00','19:00'],
+  ['fri','Planaxis','Blazy','19:00','20:00'],
+  ['fri','Planaxis','Blastoyz','20:00','21:00'],
+  ['fri','Planaxis','Vegas','21:00','22:00'],
+  ['fri','Planaxis','Avalon','22:00','23:00'],
+  ['fri','Planaxis','Electric Universe','23:00','00:00'],
+
+  ['fri','Melodia by Corona','Joulie','14:00','15:30'],
+  ['fri','Melodia by Corona','Planet Groove DJ\'s','17:00','19:15'],
+  ['fri','Melodia by Corona','John Noseda','20:00','22:00'],
+  ['fri','Melodia by Corona','Jeroen Delodder','22:00','00:00'],
+
+  ['fri','Celestia by KuCoin','Saar Kuus','13:30','15:00'],
+  ['fri','Celestia by KuCoin','AAT','15:00','16:30'],
+  ['fri','Celestia by KuCoin','Mark Knight','16:30','18:30',1],
+  ['fri','Celestia by KuCoin','Belters Only','18:30','20:00'],
+  ['fri','Celestia by KuCoin','Ruze b2b Ranger Trucco','20:00','21:30'],
+  ['fri','Celestia by KuCoin','Mr. Belt & Wezol','21:30','23:00'],
+
+  ['fri','Atmosphere','BOY&GIRL','14:00','15:30'],
+  ['fri','Atmosphere','Mha Iri','15:30','17:00'],
+  ['fri','Atmosphere','Callush','17:00','18:30'],
+  ['fri','Atmosphere','Hannah Laing','18:30','19:30'],
+  ['fri','Atmosphere','Byorn','19:30','20:30'],
+  ['fri','Atmosphere','Dyen b2b Maddix','20:30','21:30'],
+  ['fri','Atmosphere','Azyr','21:30','23:00'],
+  ['fri','Atmosphere','Onlynumbers','23:00','00:00'],
+  ['fri','Atmosphere','Holy Priest','00:00','00:55'],
+
+  ['fri','Core','Fais Le Beau b2b Sixsixsixties','13:30','15:00'],
+  ['fri','Core','Kamma','15:00','17:00'],
+  ['fri','Core','Bibi Seck b2b Faisal','17:00','19:00'],
+  ['fri','Core','Ogazón','19:00','20:30'],
+  ['fri','Core','Bullet Tooth','20:30','22:00'],
+  ['fri','Core','Mall Grab','22:00','23:45'],
+  ['fri','Core','Oscar and the Wolf','23:45','00:50'],
+
+  ['fri','Crystal Garden','Capoon','13:30','15:30'],
+  ['fri','Crystal Garden','Malive','15:30','17:00'],
+  ['fri','Crystal Garden','Joezi','17:00','18:30'],
+  ['fri','Crystal Garden','Kitty Amor b2b Curol','18:30','20:00'],
+  ['fri','Crystal Garden','Shimza','20:00','21:30'],
+  ['fri','Crystal Garden','Hugel','21:30','23:00'],
+  ['fri','Crystal Garden','Mahmut Orhan','23:00','00:30'],
+
+  ['fri','The Great Library','Meaghan','13:00','14:00'],
+  ['fri','The Great Library','NOME.','14:00','15:00'],
+  ['fri','The Great Library','5NAPBACK','15:00','16:00'],
+  ['fri','The Great Library','Merow','16:00','17:00'],
+  ['fri','The Great Library','B Jones','17:00','18:00'],
+  ['fri','The Great Library','Regi','18:00','19:00'],
+  ['fri','The Great Library','MANDY','19:00','20:00'],
+  ['fri','The Great Library','Omdat Het Kan & Average Rob','20:00','21:00'],
+  ['fri','The Great Library','HALŌ','21:00','22:00'],
+  ['fri','The Great Library','Kaskade','22:00','23:00'],
+  ['fri','The Great Library','Alan Walker','23:00','00:00'],
+  ['fri','The Great Library','Illenium','00:00','00:55'],
+
+  ['fri','Moose Bar','Jo Cox','16:00','19:00'],
+  ['fri','Moose Bar','The Bobmeister','20:00','00:00'],
+
+  ['fri','House of Fortune','Reygel','13:00','14:00'],
+  ['fri','House of Fortune','Alan Alvarez & Crazy Sir-G','14:00','15:00'],
+  ['fri','House of Fortune','Martin Trevy','15:00','16:00'],
+  ['fri','House of Fortune','Vinne','16:00','17:00'],
+  ['fri','House of Fortune','ELFIGO','18:00','19:00'],
+  ['fri','House of Fortune','Telykast','19:00','20:00'],
+  ['fri','House of Fortune','Didi Hahn','20:00','21:00'],
+  ['fri','House of Fortune','MEGURU','21:00','22:00'],
+
+  // ─── SATURDAY ───
+  ['sat','Mainstage','Angemi','14:00','15:00'],
+  ['sat','Mainstage','Mike Williams','15:00','16:15'],
+  ['sat','Mainstage','D.O.D','16:15','17:15'],
+  ['sat','Mainstage','MATTN','17:20','18:20'],
+  ['sat','Mainstage','Morten','18:20','19:20'],
+  ['sat','Mainstage','Agents of Time','19:20','20:20'],
+  ['sat','Mainstage','Sub Zero Project','20:25','21:25'],
+  ['sat','Mainstage','Armin van Buuren','21:25','22:25'],
+  ['sat','Mainstage','Dimitri Vegas & Like Mike','22:30','23:45'],
+  ['sat','Mainstage','Calvin Harris','23:45','00:45'],
+
+  ['sat','Freedom by Bud','Calao','13:30','15:00'],
+  ['sat','Freedom by Bud','Philou','15:00','16:00',1],
+  ['sat','Freedom by Bud','Mosimann b2b ELFIGO','16:00','17:00'],
+  ['sat','Freedom by Bud','Andromedik','17:00','18:00'],
+  ['sat','Freedom by Bud','Symphony Of Unity','18:00','19:00'],
+  ['sat','Freedom by Bud','Massano','19:00','20:00'],
+  ['sat','Freedom by Bud','Argy','20:00','21:00'],
+  ['sat','Freedom by Bud','Romy Janssen','21:00','22:00'],
+  ['sat','Freedom by Bud','Sebastian Ingrosso','22:00','23:00'],
+  ['sat','Freedom by Bud','Timmy Trumpet','23:00','00:30'],
+
+  ['sat','The Rose Garden','Danny Corten','13:30','15:00'],
+  ['sat','The Rose Garden','Maite Dedecker','15:00','16:30'],
+  ['sat','The Rose Garden','Dimitri Cooman','16:30','17:30'],
+  ['sat','The Rose Garden','DJ Ghost','17:30','18:30'],
+  ['sat','The Rose Garden','Franky Kloeck','18:30','19:30'],
+  ['sat','The Rose Garden','Jamie Dill','19:30','20:30'],
+  ['sat','The Rose Garden','Youri Parker','20:30','21:30'],
+  ['sat','The Rose Garden','BountyHunter','21:30','23:00'],
+  ['sat','The Rose Garden','Cherry Moon Legends (& Friends)','23:00','01:00'],
+
+  ['sat','Elixir','Knox Kind','13:00','14:00'],
+  ['sat','Elixir','RUBY XX','14:00','15:00'],
+  ['sat','Elixir','Butterfly Effect','15:00','16:00'],
+  ['sat','Elixir','DJ ART','16:00','17:00'],
+  ['sat','Elixir','Eimco','17:00','18:00'],
+  ['sat','Elixir','Sandersville','18:00','19:00'],
+  ['sat','Elixir','Lady S','19:00','20:00'],
+  ['sat','Elixir','Shoarma Soundsystem','20:00','21:00'],
+  ['sat','Elixir','Annabel Stop It','21:00','22:00'],
+  ['sat','Elixir','Nina Black','22:00','23:00'],
+  ['sat','Elixir','NOA','23:00','00:00'],
+  ['sat','Elixir','Hide N Seek','00:00','01:00',1],
+
+  ['sat','Cage','Macon','13:30','14:45'],
+  ['sat','Cage','X&Trick','14:45','16:15'],
+  ['sat','Cage','IOSIO','16:15','17:30'],
+  ['sat','Cage','Mero b2b Daire','17:30','19:00'],
+  ['sat','Cage','Uberjak\'d feat Ella Young','19:00','20:00'],
+  ['sat','Cage','Niotech','20:00','21:00'],
+  ['sat','Cage','Mondello','21:00','22:00'],
+  ['sat','Cage','Stanne','22:00','23:00'],
+
+  ['sat','The Rave Cave','Charleen Herzig','13:00','14:30',1],
+  ['sat','The Rave Cave','Simon B','14:30','16:00'],
+  ['sat','The Rave Cave','Pat Krimson','16:00','17:30'],
+  ['sat','The Rave Cave','Roma','17:30','19:00'],
+  ['sat','The Rave Cave','Ben Malone','19:00','20:30',1],
+  ['sat','The Rave Cave','Jorn Pricez','20:30','22:00'],
+  ['sat','The Rave Cave','Flowchief','22:00','23:00'],
+  ['sat','The Rave Cave','Netherworld','23:00','00:00'],
+
+  ['sat','Planaxis','Tim Bliss','13:30','15:00'],
+  ['sat','Planaxis','Alicia Hahn','15:00','16:30'],
+  ['sat','Planaxis','Yet More','16:30','18:00'],
+  ['sat','Planaxis','Dyzen','18:00','19:30'],
+  ['sat','Planaxis','Yulia Niko','19:30','21:00'],
+  ['sat','Planaxis','Colyn b2b Sainte Vie','21:00','22:30'],
+  ['sat','Planaxis','Chris Avantgarde b2b Kölsch','22:30','00:00',1],
+
+  ['sat','Melodia by Corona','Emilia De La Paz','14:00','15:30'],
+  ['sat','Melodia by Corona','Soulastico b2b Tohma','15:30','17:30'],
+  ['sat','Melodia by Corona','Larry Masmero','17:30','19:00'],
+  ['sat','Melodia by Corona','Geheimzinnig Soundsystem','19:00','20:30'],
+  ['sat','Melodia by Corona','Séa','20:30','22:00'],
+  ['sat','Melodia by Corona','Sam Girling','22:00','00:00'],
+
+  ['sat','Celestia by KuCoin','Odssey','13:00','14:00'],
+  ['sat','Celestia by KuCoin','LNY TNZ','14:00','16:00'],
+  ['sat','Celestia by KuCoin','Swanky Tunes','16:00','17:00'],
+  ['sat','Celestia by KuCoin','Bingo Players with Iceman','17:00','18:00'],
+  ['sat','Celestia by KuCoin','Dada Life','18:00','19:00'],
+  ['sat','Celestia by KuCoin','Chocolate Puma','19:00','20:00'],
+  ['sat','Celestia by KuCoin','Gregor Salto','20:00','21:00'],
+  ['sat','Celestia by KuCoin','Sander van Doorn','21:00','22:00'],
+  ['sat','Celestia by KuCoin','Dannic b2b Dyro','22:00','23:00'],
+
+  ['sat','Atmosphere','2hot2play','14:00','16:00'],
+  ['sat','Atmosphere','Noise Mafia','16:00','17:30'],
+  ['sat','Atmosphere','EMILIJA b2b Fenrick','17:30','19:00'],
+  ['sat','Atmosphere','Alt8','19:00','20:30'],
+  ['sat','Atmosphere','Pegassi','20:30','22:00'],
+  ['sat','Atmosphere','Novah','22:00','23:30'],
+  ['sat','Atmosphere','I Hate Models','23:30','00:55'],
+
+  ['sat','Core','Dc Noises b2b Tori Ann','13:30','15:00'],
+  ['sat','Core','SHEE','15:00','16:30'],
+  ['sat','Core','Dino Lenny b2b Radioslave','16:30','18:30'],
+  ['sat','Core','DJ Boring','18:30','20:30',1],
+  ['sat','Core','Skream b2b dj Seinfeld','20:30','22:30',1],
+  ['sat','Core','HAAi b2b The Blessed Madonna','22:30','00:50'],
+
+  ['sat','Crystal Garden','GUZ','13:30','15:00'],
+  ['sat','Crystal Garden','Roddy Lima','15:00','16:30'],
+  ['sat','Crystal Garden','LP Giobbi','16:30','18:00'],
+  ['sat','Crystal Garden','Ayybo b2b Odd Mob','18:00','19:30'],
+  ['sat','Crystal Garden','Max Styler','19:30','21:00'],
+  ['sat','Crystal Garden','HI-LO b2b Layton Giordani','21:00','22:30'],
+  ['sat','Crystal Garden','John Summit','22:30','00:30'],
+
+  ['sat','The Great Library','Radio Cargo','13:00','14:00'],
+  ['sat','The Great Library','me n ü','14:00','15:00'],
+  ['sat','The Great Library','Mesto','15:00','16:00'],
+  ['sat','The Great Library','ZHU','16:00','17:00'],
+  ['sat','The Great Library','Henri PFR','17:00','18:00'],
+  ['sat','The Great Library','Chris Lorenzo','18:00','19:00'],
+  ['sat','The Great Library','Wilkinson','19:00','20:00'],
+  ['sat','The Great Library','Sonny Fodera','20:00','21:30'],
+  ['sat','The Great Library','Lost Frequencies','21:30','22:45'],
+  ['sat','The Great Library','Gorgon City','22:45','00:00'],
+  ['sat','The Great Library','Netsky','00:00','00:55'],
+
+  ['sat','Moose Bar','Mr E.','15:00','19:00'],
+  ['sat','Moose Bar','De Romeo\'s','19:00','20:00',1],
+  ['sat','Moose Bar','Kurt Verheyen','20:00','00:00'],
+
+  ['sat','House of Fortune','Triciaa','13:00','14:00',1],
+  ['sat','House of Fortune','Yaz','16:00','17:00',1],
+  ['sat','House of Fortune','Carly Wilford','17:00','18:00',1],
+  ['sat','House of Fortune','Mosimann','18:00','19:00',1],
+  ['sat','House of Fortune','Nosefin','19:00','20:00',1],
+  ['sat','House of Fortune','Atkö','21:00','22:00',1],
+
+  // ─── SUNDAY ───
+  ['sun','Mainstage','Odd Mob','14:30','15:30'],
+  ['sun','Mainstage','Cyril','15:30','16:30'],
+  ['sun','Mainstage','Lucas & Steve','16:30','17:30'],
+  ['sun','Mainstage','Chase & Status (DJ set)','17:35','18:35'],
+  ['sun','Mainstage','Sara Landry','18:40','19:40'],
+  ['sun','Mainstage','Afrojack b2b R3hab','19:40','20:40'],
+  ['sun','Mainstage','Lost Frequencies','20:40','21:40'],
+  ['sun','Mainstage','Steve Aoki','21:45','22:45'],
+  ['sun','Mainstage','Martin Garrix','22:50','23:50'],
+
+  ['sun','Freedom by Bud','Axel Haube','13:30','15:00'],
+  ['sun','Freedom by Bud','Push Only','15:00','16:00'],
+  ['sun','Freedom by Bud','Korolova','16:00','17:30'],
+  ['sun','Freedom by Bud','Fideles','17:30','19:00'],
+  ['sun','Freedom by Bud','More to be announced','19:00','20:30',1],
+  ['sun','Freedom by Bud','Artbat','20:30','22:00'],
+  ['sun','Freedom by Bud','Amelie Lens presents Aura','22:00','23:30'],
+
+  ['sun','The Rose Garden','Lost Identity','13:00','14:00'],
+  ['sun','The Rose Garden','D-Charged b2b Serzo','14:00','15:00'],
+  ['sun','The Rose Garden','Mark With A K & MC Chucky','15:00','16:00'],
+  ['sun','The Rose Garden','Hard Driver','16:00','17:00'],
+  ['sun','The Rose Garden','The Purge','17:00','18:00'],
+  ['sun','The Rose Garden','Sound Rush','18:00','19:00'],
+  ['sun','The Rose Garden','Coone','19:00','20:00'],
+  ['sun','The Rose Garden','Da Tweekaz','20:00','21:30'],
+  ['sun','The Rose Garden','Warface','21:30','22:15'],
+  ['sun','The Rose Garden','The Straikerz','22:15','23:45'],
+
+  ['sun','Elixir','Dino','13:00','14:30'],
+  ['sun','Elixir','Reeze','14:30','16:00'],
+  ['sun','Elixir','Lennert Wolfs','16:00','17:00'],
+  ['sun','Elixir','Karakals','17:00','18:30'],
+  ['sun','Elixir','Vikkstar','18:30','19:30'],
+  ['sun','Elixir','Kav Verhouzer & de Hofnar','19:30','21:00'],
+  ['sun','Elixir','Jaël Ost & MagiK','21:00','22:00'],
+  ['sun','Elixir','Michael Amani','22:00','23:00'],
+  ['sun','Elixir','Michael Amani & Friends','23:00','00:00'],
+
+  ['sun','Cage','Netty Hugo','13:30','15:00'],
+  ['sun','Cage','Amotik','15:00','17:00'],
+  ['sun','Cage','Quelza','17:00','19:00'],
+  ['sun','Cage','Blasha & Allatt','19:00','21:00'],
+  ['sun','Cage','Freddy K','21:00','23:00'],
+
+  ['sun','The Rave Cave','Benny Plays','13:00','15:00'],
+  ['sun','The Rave Cave','EME','15:00','16:00'],
+  ['sun','The Rave Cave','Kriss Reeve','16:00','17:00'],
+  ['sun','The Rave Cave','Muze','17:00','18:00'],
+  ['sun','The Rave Cave','Mr. Rewind','18:00','19:00'],
+  ['sun','The Rave Cave','D. Guaetta b2b Neon','19:00','20:00'],
+  ['sun','The Rave Cave','Hyalyte','20:00','21:00'],
+  ['sun','The Rave Cave','Leenders','21:00','22:00',1],
+  ['sun','The Rave Cave','DXNØ','22:00','23:00',1],
+
+  ['sun','Planaxis','Okayval','13:00','15:00'],
+  ['sun','Planaxis','ANAYA','15:00','16:00'],
+  ['sun','Planaxis','VASSY','16:00','17:00',1],
+  ['sun','Planaxis','Yves V b2b StadiumX','17:00','18:00'],
+  ['sun','Planaxis','Sick Individuals','18:00','19:00'],
+  ['sun','Planaxis','Deorro','19:00','20:00'],
+  ['sun','Planaxis','Laidback Luke','20:00','21:00'],
+  ['sun','Planaxis','Superheroes','21:00','22:00'],
+  ['sun','Planaxis','Quintino','22:00','23:00'],
+  ['sun','Planaxis','Chuckie','23:00','23:50'],
+
+  ['sun','Melodia by Corona','Bobbi Antonni','14:00','15:30'],
+  ['sun','Melodia by Corona','Cristiano Da Silva','15:30','16:30'],
+  ['sun','Melodia by Corona','Rayco Santos','16:30','17:30'],
+  ['sun','Melodia by Corona','Valentín Huedo','17:30','18:30'],
+  ['sun','Melodia by Corona','Alex Kennon','18:30','19:30'],
+  ['sun','Melodia by Corona','Oriol Calvo','19:30','20:30'],
+  ['sun','Melodia by Corona','Delafino & Luna Fino','20:30','22:00'],
+  ['sun','Melodia by Corona','Eli Rojas','22:00','23:00'],
+
+  ['sun','Celestia by KuCoin','Lisa Korver','13:30','15:00'],
+  ['sun','Celestia by KuCoin','Newtone','15:00','16:30'],
+  ['sun','Celestia by KuCoin','Kyle Starkey','16:30','18:00'],
+  ['sun','Celestia by KuCoin','Bella Claxton b2b Paige Tomlinson','18:00','19:30'],
+  ['sun','Celestia by KuCoin','Morgan Seatree','19:30','21:00'],
+  ['sun','Celestia by KuCoin','HU','21:00','22:30'],
+
+  ['sun','Atmosphere','Riana Holley','13:30','15:00'],
+  ['sun','Atmosphere','Portex','15:00','16:30'],
+  ['sun','Atmosphere','Alycia Bezgo b2b Biianco','16:30','18:00'],
+  ['sun','Atmosphere','Adrián Mills','18:00','19:30'],
+  ['sun','Atmosphere','Nikolina','19:30','21:00'],
+  ['sun','Atmosphere','Trym','21:00','22:30'],
+  ['sun','Atmosphere','Kobosil','22:30','23:55'],
+
+  ['sun','Core','Catalina','13:00','13:30'],
+  ['sun','Core','Kellar','13:30','15:00'],
+  ['sun','Core','Saidah','15:30','17:00'],
+  ['sun','Core','Helena Lauwaert','17:00','18:30'],
+  ['sun','Core','Lammer','18:30','20:30'],
+  ['sun','Core','Benwal b2b Labat','20:30','22:00'],
+  ['sun','Core','Malugi','22:00','23:50'],
+
+  ['sun','Crystal Garden','Franc Fala b2b Benja','13:00','15:00'],
+  ['sun','Crystal Garden','Bhaskar','15:00','16:30'],
+  ['sun','Crystal Garden','Brina Knauss','16:30','18:00'],
+  ['sun','Crystal Garden','Like Mike','18:00','19:30'],
+  ['sun','Crystal Garden','Mind Against','19:30','21:30'],
+  ['sun','Crystal Garden','Kevin de Vries b2b Meduza','21:30','00:00'],
+
+  ['sun','The Great Library','Lucca van Damme','13:00','14:00'],
+  ['sun','The Great Library','Diego Miranda b2b Jerry Davila','14:00','15:00'],
+  ['sun','The Great Library','Darren Styles','15:00','16:00'],
+  ['sun','The Great Library','Kaaze','16:00','17:00'],
+  ['sun','The Great Library','Paris Hilton','17:00','18:00'],
+  ['sun','The Great Library','Joel Corry','18:00','19:00',1],
+  ['sun','The Great Library','NERVO','19:00','20:00'],
+  ['sun','The Great Library','Nico Moreno','20:00','21:00'],
+  ['sun','The Great Library','Bassjackers','21:00','22:00'],
+  ['sun','The Great Library','Dimitri Vegas','22:00','23:00',1],
+  ['sun','The Great Library','Brennan Heart','23:00','23:55'],
+
+  ['sun','Moose Bar','Brian','16:00','19:00'],
+  ['sun','Moose Bar','Peter Wackel','19:00','20:00',1],
+  ['sun','Moose Bar','Jan V','20:00','00:00'],
+
+  ['sun','House of Fortune','DJ Lex','13:00','14:00'],
+  ['sun','House of Fortune','The Criminal Sounds','16:00','17:00'],
+  ['sun','House of Fortune','DJ F.R.A.N.K','17:00','18:00'],
+  ['sun','House of Fortune','TIGERLILY','18:00','19:00'],
+  ['sun','House of Fortune','Bassjackers','19:00','20:00'],
+  ['sun','House of Fortune','Joel Corry','20:00','21:00',1],
+  ['sun','House of Fortune','The Rocketman','21:00','22:00'],
+];
+const SCHEDULE = SCHEDULE_RAW.map(r => ({ day: r[0], stage: r[1], name: r[2], start: r[3], end: r[4], extra: !!r[5] }));
+
+// Stage order for the timetable rows (matches the official grid layout)
+const TT_STAGE_ORDER = [
+  "Mainstage", "Freedom by Bud", "The Rose Garden", "Elixir", "Cage",
+  "The Rave Cave", "Planaxis", "Melodia by Corona", "Celestia by KuCoin",
+  "Atmosphere", "Core", "Crystal Garden", "The Great Library",
+  "Moose Bar", "House of Fortune"
+];
+
+const TT_DAY_START = 12 * 60;   // 12:00
+const TT_DAY_END   = 25 * 60;   // 01:00 (next day)
+const TT_PX = 2;                // px per minute
+let ttDay = 'fri';
+
+function ttToMin(t) {
+  const [h, m] = t.split(':').map(Number);
+  let v = h * 60 + m;
+  if (v < TT_DAY_START) v += 1440; // after-midnight slots belong to the same night
+  return v;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
 const STORAGE_KEY = 'consciencia_likes';
@@ -1059,7 +1568,8 @@ document.querySelectorAll('.main-tab').forEach(tab => {
       document.getElementById('liked-page').style.display = 'block';
       renderLiked();
     } else {
-      document.getElementById('timetable-page').style.display = 'flex';
+      document.getElementById('timetable-page').style.display = 'block';
+      renderTimetable();
     }
   });
 });
@@ -1203,6 +1713,95 @@ function renderLiked() {
     });
   });
 }
+
+function renderTimetable() {
+  const grid = document.getElementById('tt-grid');
+  grid.innerHTML = '';
+  const totalW = (TT_DAY_END - TT_DAY_START) * TT_PX;
+
+  // Time axis
+  const axis = document.createElement('div');
+  axis.className = 'tt-axis';
+  const spacer = document.createElement('div');
+  spacer.className = 'tt-axis-spacer';
+  axis.appendChild(spacer);
+  const axisTrack = document.createElement('div');
+  axisTrack.className = 'tt-axis-track';
+  axisTrack.style.width = totalW + 'px';
+  for (let m = TT_DAY_START; m <= TT_DAY_END; m += 60) {
+    const tick = document.createElement('div');
+    tick.className = 'tt-tick';
+    const hh = (Math.floor(m / 60)) % 24;
+    tick.textContent = String(hh).padStart(2, '0') + ':00';
+    tick.style.left = ((m - TT_DAY_START) * TT_PX) + 'px';
+    axisTrack.appendChild(tick);
+  }
+  axis.appendChild(axisTrack);
+  grid.appendChild(axis);
+
+  // Stage rows
+  TT_STAGE_ORDER.forEach(stage => {
+    const items = SCHEDULE.filter(x => x.day === ttDay && x.stage === stage);
+    if (items.length === 0) return;
+
+    const row = document.createElement('div');
+    row.className = 'tt-row';
+
+    const label = document.createElement('div');
+    label.className = 'tt-stage-label';
+    label.textContent = stage.toUpperCase();
+    row.appendChild(label);
+
+    const track = document.createElement('div');
+    track.className = 'tt-track';
+    track.style.width = totalW + 'px';
+
+    items.forEach(it => {
+      const s = ttToMin(it.start);
+      const e = ttToMin(it.end);
+      const block = document.createElement('div');
+      block.className = 'tt-block';
+      block.style.left = ((s - TT_DAY_START) * TT_PX) + 'px';
+      block.style.width = Math.max((e - s) * TT_PX - 3, 28) + 'px';
+
+      if (it.extra) {
+        block.classList.add('tt-static');
+      } else {
+        const pseudo = { name: it.name, day: it.day };
+        const ls = getLikeState(pseudo);
+        if (ls === 'emma') block.classList.add('liked-emma');
+        else if (ls === 'tj') block.classList.add('liked-tj');
+        else if (ls === 'both') block.classList.add('liked-both');
+        block.addEventListener('click', () => {
+          toggleLike(pseudo);
+          renderTimetable();
+        });
+      }
+
+      const nm = document.createElement('div');
+      nm.className = 'tt-name';
+      nm.textContent = it.name;
+      const tm = document.createElement('div');
+      tm.className = 'tt-time';
+      tm.textContent = it.start + ' – ' + it.end;
+      block.appendChild(nm);
+      block.appendChild(tm);
+      track.appendChild(block);
+    });
+
+    row.appendChild(track);
+    grid.appendChild(row);
+  });
+}
+
+document.querySelectorAll('.tt-day-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tt-day-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    ttDay = tab.dataset.day;
+    renderTimetable();
+  });
+});
 
 function makePill(artist, showGenre) {
   const pill = document.createElement('div');
